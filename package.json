@@ -4,10 +4,11 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": " nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "start": "PORT=3014 nuxt start"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
