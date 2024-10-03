@@ -1,36 +1,14 @@
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --light: "Cairo-Light";
-  --regular: "Cairo-Regular";
-  --medium: "Cairo-Medium";
-  --bold: "Cairo-Bold";
-  --semi_bold: "Cairo-SemiBold";
+body {
+  font-family: "Cairo", sans-serif;
+  overflow: hidden;
 }
 
-@font-face {
-  font-family: var(--light);
-  src: url("@/assets/fonts/Cairo-Light.ttf");
-}
-
-@font-face {
-  font-family: var(--regular);
-  src: url("@/assets/fonts/Cairo-Regular.ttf");
-}
-
-@font-face {
-  font-family: var(--medium);
-  src: url("@/assets/fonts/Cairo-Medium.ttf");
-}
-
-@font-face {
-  font-family: var(--bold);
-  src: url("@/assets/fonts/Cairo-Bold.ttf");
-}
-
-@font-face {
-  font-family: var(--semi_bold);
-  src: url("@/assets/fonts/Cairo-SemiBold.ttf");
+.v-application__wrap {
+  min-height: unset !important;
 }

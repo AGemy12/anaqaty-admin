@@ -10,13 +10,19 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@mdi/font": "^7.4.47",
+    "@nuxt/icon": "^1.5.2",
+    "@pinia/nuxt": "^0.5.5",
     "nuxt": "^3.13.0",
-    "vue": "latest",
+    "pinia": "^2.2.4",
+    "vue": "^3.5.10",
     "vue-router": "latest"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.13"
+    "tailwindcss": "^3.4.13",
+    "vite-plugin-vuetify": "^2.0.4",
+    "vuetify": "^3.7.2"
   }
 }
