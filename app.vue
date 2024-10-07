@@ -1,5 +1,5 @@
 <template>
-  <div class="absolute top-[70px] right-[300px]">
+  <div>
     <nuxt-layout>
       <v-app>
         <NuxtPage />
@@ -7,3 +7,23 @@
     </nuxt-layout>
   </div>
 </template>
+
+<script setup>
+import { onMounted } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+onMounted(() => {
+  checkLoginStatus();
+});
+
+function checkLoginStatus() {
+  const isLoggedIn = !!localStorage.getItem("accessToken");
+  if (isLoggedIn) {
+    router.push("/");
+  } else {
+    router.push("/login");
+  }
+}
+</script>

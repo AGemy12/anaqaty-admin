@@ -4,11 +4,16 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  direction: rtl;
+}
+
 body {
   font-family: "Cairo", sans-serif;
   overflow: hidden;
 }
 
 .v-application__wrap {
+  position: unset !important;
   min-height: unset !important;
 }

@@ -63,7 +63,7 @@ export default {
     password: "",
     confirmPassword: "",
     show1: false,
-    show2: true,
+    show2: false,
 
     emailRules: [
       (value) => {
