@@ -38,10 +38,13 @@
 </template>
 
 <script setup>
+useHead({
+  title: "Anaqaty | تحديث فئة",
+});
 import PagesHeader from "~/components/mini/PagesHeader.vue";
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import qs from "qs"; // استيراد مكتبة qs لتحويل الكائنات إلى x-www-form-urlencoded
+import qs from "qs";
 import AlertModel from "~/components/mini/AlertModel.vue";
 
 definePageMeta({

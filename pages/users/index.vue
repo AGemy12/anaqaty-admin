@@ -67,6 +67,9 @@
 definePageMeta({
   middleware: "auth",
 });
+useHead({
+  title: "Anaqaty | المستخدمين",
+});
 // End <====> Auth Check <====>
 import Button from "~/components/mini/Button.vue";
 import { useRouter } from "vue-router";

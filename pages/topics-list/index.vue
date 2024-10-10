@@ -68,6 +68,9 @@
 </template>
 
 <script setup lang="ts">
+useHead({
+  title: "Anaqaty | قائمة الموضوعات",
+});
 import PagesHeader from "~/components/mini/PagesHeader.vue";
 
 const topicsData = [

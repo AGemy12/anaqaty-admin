@@ -29,7 +29,7 @@
           type="submit"
           block
         >
-          إضافة مستخدم
+          إضافة فئة
         </v-btn>
       </v-form>
     </v-sheet>
@@ -49,6 +49,9 @@ definePageMeta({
   // Start <====> Auth Check <====>
   middleware: "auth",
   // End <====> Auth Check <====>
+});
+useHead({
+  title: "Anaqaty | اضافة فئة",
 });
 
 const router = useRouter();

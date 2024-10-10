@@ -90,14 +90,17 @@
 </template>
 
 <script setup>
+definePageMeta({
+  middleware: "auth",
+});
+useHead({
+  title: "Anaqaty | الفئات",
+});
 import Button from "~/components/mini/Button.vue";
 import PagesHeader from "~/components/mini/PagesHeader.vue";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import AnaqatyModel from "~/components/mini/AnaqatyModel.vue";
-definePageMeta({
-  middleware: "auth",
-});
 
 const router = useRouter();
 const categoriesData = ref([]);

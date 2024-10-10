@@ -11,5 +11,8 @@
 definePageMeta({
   middleware: "auth",
 });
+useHead({
+  title: "Anaqaty |  الصفحة الرئيسية",
+});
 // End <====> Auth Check <====>
 </script>
