@@ -1,13 +1,11 @@
 <template>
   <v-app>
-    <div>
-      <!-- <Header /> -->
-      <Sidebar />
-      <div
-        class="absolute top-0 w-full md:w-[calc(100%-300px)] md:right-[300px] m-[2rem]"
-      >
-        <slot />
-      </div>
-    </div>
+    <MenuBtn />
+    <Sidebar />
+    <slot />
   </v-app>
 </template>
+
+<script setup lang="ts">
+import MenuBtn from "~/components/mini/MenuBtn.vue";
+</script>

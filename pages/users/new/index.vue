@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <section>
     <PagesHeader
       title="إنشاء مستخدم جديد
 "
@@ -37,15 +37,19 @@
         </v-btn>
       </v-form>
     </v-sheet>
-  </div>
+  </section>
 </template>
 
 <script setup>
 definePageMeta({
   layout: "default",
+
+  // Start <====> Auth Check <====>
+  middleware: "auth",
+  // End <====> Auth Check <====>
 });
 import PagesHeader from "~/components/mini/PagesHeader.vue";
-import { ref, computed } from "vue";
+import { ref } from "vue";
 
 const name = ref("");
 const email = ref("");
@@ -81,29 +85,4 @@ const passwordRules = [
     return "يجب ألا تقل كلمة المرور عن 6 أحرف";
   },
 ];
-
-const isNameValid = computed(() => {
-  return nameRules.every((rule) => rule(name.value) === true);
-});
-
-const isEmailValid = computed(() => {
-  return emailRules.every((rule) => rule(email.value) === true);
-});
-
-const isPasswordValid = computed(() => {
-  return passwordRules.every((rule) => rule(password.value) === true);
-});
-
-// الدوال للحصول على رسائل الخطأ
-const emailError = computed(() => {
-  const invalidRule = emailRules.find((rule) => rule(email.value) !== true);
-  return invalidRule ? invalidRule(email.value) : "";
-});
-
-const passwordError = computed(() => {
-  const invalidRule = passwordRules.find(
-    (rule) => rule(password.value) !== true
-  );
-  return invalidRule ? invalidRule(password.value) : "";
-});
 </script>

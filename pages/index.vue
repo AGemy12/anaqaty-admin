@@ -1,7 +1,15 @@
 <template>
-  <div class="home_page">
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis est, sunt
-    harum accusamus quod iste a cumque dignissimos fugit enim vitae, asperiores
-    veritatis optio reiciendis rem officiis nulla! Repudiandae, autem?
-  </div>
+  <section class="flex justify-center items-center h-screen">
+    <div class="max-w-[400px] mx-auto">
+      <img src="/black_logo.svg" alt="لوجو الموقع" />
+    </div>
+  </section>
 </template>
+
+<script setup>
+// Start <====> Auth Check <====>
+definePageMeta({
+  middleware: "auth",
+});
+// End <====> Auth Check <====>
+</script>

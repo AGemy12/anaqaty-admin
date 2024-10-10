@@ -5,6 +5,7 @@ export const useNavStore = defineStore("navStore", () => {
   // Start <====> Open Nested List  <====>
   const openItem = ref({});
   const openMenu = ref(false);
+  const activeLinkId = ref(null);
 
   const toggleItem = (id) => {
     if (!openItem.value.hasOwnProperty(id)) {
@@ -21,10 +22,15 @@ export const useNavStore = defineStore("navStore", () => {
   };
   // End   <====> Toggler Menu  <====>
 
+  const setActiveLink = (id) => {
+    activeLinkId.value = id;
+  };
+
   return {
     openItem,
     openMenu,
     toggleItem,
     toggleMenu,
+    setActiveLink,
   };
 });

@@ -1,21 +1,23 @@
 <template>
-  <section class="max-w-full">
-    <PagesHeader title="المستخدمين" />
-    <Button title="إضافة مستخدم" :fire-click="goToAddUsersPage" />
+  <section>
+    <PagesHeader title="قائمة الموضوعات" />
     <v-table class="overflow-auto md:w-screen">
       <thead class="">
-        <tr>
+        <tr class="text-center">
           <th class="text-center text-[12px] md:text-[18px] whitespace-nowrap">
             #
           </th>
           <th class="text-center text-[12px] md:text-[18px] whitespace-nowrap">
-            الإسم
+            العنوان
           </th>
           <th class="text-center text-[12px] md:text-[18px] whitespace-nowrap">
-            البريد الإلكتروني
+            القسم
           </th>
           <th class="text-center text-[12px] md:text-[18px] whitespace-nowrap">
-            تم الإنشاء في
+            المشاهدات
+          </th>
+          <th class="text-center text-[12px] md:text-[18px] whitespace-nowrap">
+            اخر تحديث
           </th>
           <th class="text-center text-[12px] md:text-[18px] whitespace-nowrap">
             خيارات
@@ -24,21 +26,24 @@
       </thead>
       <tbody>
         <tr
-          class="cursor-pointer duration-300 hover:bg-alt text-center"
-          v-for="item in users"
-          :key="item.name"
+          class="cursor-default text-center duration-300 hover:bg-alt"
+          v-for="item in topicsData"
+          :key="item.id"
         >
           <td class="text-[12px] md:text-[15px] whitespace-nowrap">
             {{ item.id }}
           </td>
           <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.name }}
+            {{ item.title }}
           </td>
           <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.email }}
+            {{ item.category }}
           </td>
           <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.date }}
+            {{ item.views }}
+          </td>
+          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+            {{ item.lastUpdate }}
           </td>
           <td
             class="text-[12px] md:text-[15px] whitespace-nowrap flex items-center justify-center"
@@ -62,28 +67,37 @@
   </section>
 </template>
 
-<script setup>
-// Start <====> Auth Check <====>
-definePageMeta({
-  middleware: "auth",
-});
-// End <====> Auth Check <====>
-import Button from "~/components/mini/Button.vue";
-import { useRouter } from "vue-router";
+<script setup lang="ts">
 import PagesHeader from "~/components/mini/PagesHeader.vue";
 
-const router = useRouter();
-
-const users = [
+const topicsData = [
   {
     id: 1,
-    name: "Ahmad Gamal",
-    email: "aggamal98@gmail.com",
-    date: "10/05/2024",
+    title: "خبير إقتصادي تركي عن توقعاته",
+    category: "موضه",
+    views: 220,
+    lastUpdate: "30/9/2024 || 01:25:03",
+  },
+  {
+    id: 2,
+    title: "خبير إقتصادي تركي عن توقعاته",
+    category: "موضه",
+    views: 220,
+    lastUpdate: "30/9/2024 || 01:25:03",
+  },
+  {
+    id: 3,
+    title: "خبير إقتصادي تركي عن توقعاته",
+    category: "موضه",
+    views: 220,
+    lastUpdate: "30/9/2024 || 01:25:03",
+  },
+  {
+    id: 4,
+    title: "خبير إقتصادي تركي عن توقعاته",
+    category: "موضه",
+    views: 220,
+    lastUpdate: "30/9/2024 || 01:25:03",
   },
 ];
-
-const goToAddUsersPage = () => {
-  router.push("users/new");
-};
 </script>

@@ -1,7 +1,7 @@
 <template>
   <ul class="my-[2rem]">
     <li
-      class="overflow-hidden mb-[1rem]"
+      class="overflow-hidden mb-[0.75rem]"
       v-for="link in mainNavLinks"
       :key="link.id"
     >
@@ -26,7 +26,12 @@
         class="mx-[1rem] transition-all duration-500 overflow-hidden"
         :style="{ maxHeight: openItem[link.id] ? '200px' : '0' }"
       >
-        <li class="my-2" v-for="item in link.nestedNavLinks" :key="item.id">
+        <li
+          class="my-2"
+          v-for="item in link.nestedNavLinks"
+          :key="item.id"
+          @click="closeMenu"
+        >
           <nuxt-link
             :href="item.path"
             class="p-3 text-[15px] duration-300 hover:bg-alt flex items-center justify-start gap-1"
@@ -38,7 +43,7 @@
       </ul>
     </li>
 
-    <li class="overflow-hidden mb-[1rem]">
+    <li class="overflow-hidden mb-[0.75rem]" @click="closeMenu">
       <nuxt-link
         to="/categories"
         class="p-3 flex justify-between items-center w-full duration-300 hover:bg-alt rounded-md cursor-pointer"
@@ -48,12 +53,12 @@
             name="material-symbols:category-search-outline"
             class="text-[1.5rem]"
           />
-          <span> الأقسام </span>
+          <span> الفئات </span>
         </div>
       </nuxt-link>
     </li>
 
-    <li class="overflow-hidden mb-[1rem]">
+    <li class="overflow-hidden mb-[0.75rem]" @click="closeMenu">
       <nuxt-link
         to="/users"
         class="p-3 flex justify-between items-center w-full duration-300 hover:bg-alt rounded-md cursor-pointer"
@@ -65,16 +70,16 @@
       </nuxt-link>
     </li>
 
-    <li class="overflow-hidden mb-[1rem]">
-      <nuxt-link
-        to="/login"
+    <li class="overflow-hidden mb-[0.75rem]" @click="closeMenu">
+      <button
         class="p-3 flex justify-between items-center w-full duration-300 hover:bg-alt rounded-md cursor-pointer"
+        @click="logoutHandel"
       >
         <div class="flex justify-start items-center gap-2">
           <Icon name="material-symbols:logout" class="text-[1.5rem]" />
           <span> تسجيل الخروج </span>
         </div>
-      </nuxt-link>
+      </button>
     </li>
   </ul>
 </template>
@@ -82,6 +87,7 @@
 <script setup>
 import { ref } from "vue";
 import { useNavStore } from "@/stores/navbarStore";
+import Cookies from "js-cookie";
 
 const navStore = useNavStore();
 
@@ -104,7 +110,7 @@ const mainNavLinks = ref([
         id: 2,
         title: "قائمة الموضوعات",
         addIcon: "material-symbols:news-outline-rounded",
-        path: "##",
+        path: "/topics-list",
       },
     ],
   },
@@ -129,4 +135,18 @@ const mainNavLinks = ref([
     ],
   },
 ]);
+
+const logoutHandel = () => {
+  Cookies.remove("anaqaty_admin_token");
+  Cookies.remove("anaqaty_admin_user");
+  setTimeout(() => {
+    window.location.reload();
+  }, 1000);
+};
+
+const closeMenu = () => {
+  setTimeout(() => {
+    navStore.openMenu = false;
+  }, 500);
+};
 </script>

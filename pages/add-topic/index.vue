@@ -40,6 +40,12 @@
 </template>
 
 <script setup lang="ts">
+// Start <====> Auth Check <====>
+definePageMeta({
+  middleware: "auth",
+});
+// End <====> Auth Check <====>
+
 import { onMounted, ref } from "vue";
 import "quill/dist/quill.snow.css"; // تأكد من استيراد CSS
 import PagesHeader from "~/components/mini/PagesHeader.vue";

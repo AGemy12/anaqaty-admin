@@ -31,40 +31,29 @@
   </section>
 </template>
 
-<script>
+<script setup>
+// Start <====> Auth Check <====>
+definePageMeta({
+  middleware: "auth",
+});
+// End <====> Auth Check <====>
 import Logo from "~/components/mini/Logo.vue";
-
+import { ref } from "vue";
 definePageMeta({
   layout: "reg",
 });
-export default {
-  data: () => ({
-    email: "",
-    password: "",
-    emailRules: [
-      (value) => {
-        if (value) return true;
-        return "يجب إدخال البريد الإلكتروني";
-      },
-      (value) => {
-        const emailPattern = /^[a-zA-Z0-9]{2,}@[a-zA-Z]{2,}\.com$/;
-        if (emailPattern.test(value)) return true;
-        return "يجب إدخال بريد إلكتروني صالح";
-      },
-    ],
-    passwordRules: [
-      (value) => {
-        if (value) return true;
-        return "يجب إدخال كلمة المرور";
-      },
-      (value) => {
-        if (value.length >= 6) return true;
-        return "يجب ألا تقل كلمة المرور عن 6 أحرف";
-      },
-    ],
-  }),
-  components: {
-    Logo,
+
+const email = ref("");
+
+const emailRules = [
+  (value) => {
+    if (value) return true;
+    return "يجب إدخال البريد الإلكتروني";
   },
-};
+  (value) => {
+    const emailPattern = /^[a-zA-Z0-9]{2,}@[a-zA-Z]{2,}\.com$/;
+    if (emailPattern.test(value)) return true;
+    return "يجب إدخال بريد إلكتروني صالح";
+  },
+];
 </script>

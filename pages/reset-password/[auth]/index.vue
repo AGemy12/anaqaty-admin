@@ -51,63 +51,58 @@
   </section>
 </template>
 
-<script>
-import Logo from "~/components/mini/Logo.vue";
-
+<script setup>
 definePageMeta({
   layout: "reg",
+  middleware: "auth",
 });
-export default {
-  data: () => ({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    show1: false,
-    show2: false,
+import Logo from "~/components/mini/Logo.vue";
+import { ref, computed } from "vue";
 
-    emailRules: [
-      (value) => {
-        if (value) return true;
-        return "يجب إدخال البريد الإلكتروني";
-      },
-      (value) => {
-        const emailPattern = /^[a-zA-Z0-9]{2,}@[a-zA-Z]{2,}\.com$/;
-        if (emailPattern.test(value)) return true;
-        return "يجب إدخال بريد إلكتروني صالح";
-      },
-    ],
-    passwordRules: [
-      (value) => {
-        if (value) return true;
-        return "يجب إدخال كلمة المرور";
-      },
-      (value) => {
-        if (value.length >= 6) return true;
-        return "يجب ألا تقل كلمة المرور عن 6 أحرف";
-      },
-    ],
-  }),
+const email = ref("");
+const password = ref("");
+const confirmPassword = ref("");
 
-  computed: {
-    confirmPasswordRules() {
-      return [
-        (value) => {
-          if (value) return true;
-          return "يجب إدخال كلمة المرور";
-        },
-        (value) => {
-          if (value.length >= 6) return true;
-          return "يجب ألا تقل كلمة المرور عن 6 أحرف";
-        },
-        (value) => {
-          if (value === this.password) return true;
-          return "كلمة المرور وتأكيد كلمة المرور غير متطابقتين";
-        },
-      ];
+const show1 = ref(false);
+const show2 = ref(false);
+
+const emailRules = [
+  (value) => {
+    if (value) return true;
+    return "يجب إدخال البريد الإلكتروني";
+  },
+  (value) => {
+    const emailPattern = /^[a-zA-Z0-9]{2,}@[a-zA-Z]{2,}\.com$/;
+    if (emailPattern.test(value)) return true;
+    return "يجب إدخال بريد إلكتروني صالح";
+  },
+];
+
+const passwordRules = [
+  (value) => {
+    if (value) return true;
+    return "يجب إدخال كلمة المرور";
+  },
+  (value) => {
+    if (value.length >= 6) return true;
+    return "يجب ألا تقل كلمة المرور عن 6 أحرف";
+  },
+];
+
+const confirmPasswordRules = computed(() => {
+  return [
+    (value) => {
+      if (value) return true;
+      return "يجب إدخال كلمة المرور";
     },
-  },
-  components: {
-    Logo,
-  },
-};
+    (value) => {
+      if (value.length >= 6) return true;
+      return "يجب ألا تقل كلمة المرور عن 6 أحرف";
+    },
+    (value) => {
+      if (value === password.value) return true;
+      return "كلمة المرور وتأكيد كلمة المرور غير متطابقتين";
+    },
+  ];
+});
 </script>
