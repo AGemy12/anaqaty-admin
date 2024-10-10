@@ -9,8 +9,14 @@
       <!-- <h1 class="w-fit mx-auto font-bold text-[red]">
         هل أنت متأكد من أنك تريد حذف هذه الفئة؟
       </h1> -->
-      <h1 class="w-fit mx-auto text-[14px] md:text-[18px] font-bold text-[red]">
-        {{ messageTitle }}
+      <h1
+        class="w-fit mx-auto text-[14px] md:text-[16px] font-bold flex items-center justify-center gap-2"
+      >
+        <Icon
+          name="solar:danger-triangle-linear"
+          class="text-[red] text-[25px]"
+        />
+        <span> {{ messageTitle }}</span>
       </h1>
       <div class="w-full flex items-center justify-center gap-6">
         <button

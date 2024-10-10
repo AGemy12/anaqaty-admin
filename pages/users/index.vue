@@ -15,6 +15,9 @@
             البريد الإلكتروني
           </th>
           <th class="text-center text-[12px] md:text-[18px] whitespace-nowrap">
+            دور المستخدم
+          </th>
+          <th class="text-center text-[12px] md:text-[18px] whitespace-nowrap">
             تم الإنشاء في
           </th>
           <th class="text-center text-[12px] md:text-[18px] whitespace-nowrap">
@@ -37,6 +40,7 @@
           <td class="text-[12px] md:text-[15px] whitespace-nowrap">
             {{ item.email }}
           </td>
+          <td class="text-[12px] md:text-[15px] whitespace-nowrap">مسؤول</td>
           <td class="text-[12px] md:text-[15px] whitespace-nowrap">
             {{ item.date }}
           </td>
@@ -86,7 +90,49 @@ const users = [
   },
 ];
 
+// ###################################### Start Get Users Request ===========================================
+
+async function handleLogin() {
+  loading.value = true;
+
+  try {
+    const response = await useNuxtApp().$axios.get("login", {
+      email: email.value,
+      password: password.value,
+    });
+
+    if (response.data.access_token) {
+      const token = response.data.access_token;
+      const user = response.data.user.name;
+
+      Cookies.set("anaqaty_admin_token", token, { expires: 7 });
+      Cookies.set("anaqaty_admin_user", user, { expires: 7 });
+
+      // console.log(token, user);
+      isShowModel.value = true;
+      ProgressMessage.value = response.data.message;
+      await showAlert();
+      router.push("/");
+    } else {
+      console.error("خطأ في تسجيل الدخول:", response.data.message);
+      isShowModel.value = true;
+      ProgressMessage.value = response.data.message;
+      await showAlert();
+    }
+  } catch (error) {
+    isShowModel.value = true;
+
+    ProgressMessage.value = error.response.data.message;
+
+    await showAlert();
+  } finally {
+    loading.value = false;
+  }
+}
+
+// ###################################### End  Get Users Request =============================================
+
 const goToAddUsersPage = () => {
-  router.push("users/new");
+  router.push("/add-user");
 };
 </script>

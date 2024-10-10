@@ -59,18 +59,6 @@
     </li>
 
     <li class="overflow-hidden mb-[0.75rem]" @click="closeMenu">
-      <nuxt-link
-        to="/users"
-        class="p-3 flex justify-between items-center w-full duration-300 hover:bg-alt rounded-md cursor-pointer"
-      >
-        <div class="flex justify-start items-center gap-2">
-          <Icon name="mage:users-fill" class="text-[1.5rem]" />
-          <span> المستخدمين </span>
-        </div>
-      </nuxt-link>
-    </li>
-
-    <li class="overflow-hidden mb-[0.75rem]" @click="closeMenu">
       <button
         class="p-3 flex justify-between items-center w-full duration-300 hover:bg-alt rounded-md cursor-pointer"
         @click="logoutHandel"
@@ -131,6 +119,26 @@ const mainNavLinks = ref([
         title: "الكلمات المفتاحية",
         addIcon: "oui:token-keyword",
         path: "##",
+      },
+    ],
+  },
+  {
+    id: 3,
+    mainTitle: "المستخدمين",
+    mainIcon: "mage:users-fill",
+    arrowIcon: "material-symbols:keyboard-arrow-left",
+    nestedNavLinks: [
+      {
+        id: 1,
+        title: "قائمة المستخدمين",
+        addIcon: "mage:users-fill",
+        path: "/users",
+      },
+      {
+        id: 2,
+        title: "الأدوار",
+        addIcon: "oui:app-users-roles",
+        path: "/users/roles",
       },
     ],
   },

@@ -1,7 +1,7 @@
 <template>
   <section>
     <PagesHeader title="الفئات" />
-    <Button title="إضافة فئة" :fire-click="goToAddUsersPage" />
+    <Button title="إضافة فئة" :fire-click="goToAddCategoryPage" />
     <v-table class="overflow-auto md:w-screen">
       <thead>
         <tr class="text-center">
@@ -107,7 +107,7 @@ const categoriesData = ref([]);
 const modeldIsOpend = ref(false);
 let categoryIdToDelete = ref(null); // لحفظ المعرف الذي نريد حذفه
 
-async function handleLogin() {
+async function getCategoriesData() {
   try {
     const response = await useNuxtApp().$axios.get("categories");
     categoriesData.value = response.data.categories;
@@ -117,10 +117,10 @@ async function handleLogin() {
 }
 
 onMounted(() => {
-  handleLogin();
+  getCategoriesData();
 });
 
-const goToAddUsersPage = () => {
+const goToAddCategoryPage = () => {
   router.push("/add-category");
 };
 
@@ -143,7 +143,7 @@ const deleteCategory = async () => {
       await useNuxtApp().$axios.delete(
         `DeleteCategory/${categoryIdToDelete.value}`
       );
-      await handleLogin();
+      await getCategoriesData();
       modeldIsOpend.value = false; // إغلاق النموذج
     } catch (error) {
       console.error("Error deleting category:", error);

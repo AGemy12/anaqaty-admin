@@ -78,7 +78,6 @@ const showAlert = () => {
   return new Promise((resolve) => {
     setTimeout(() => {
       isOpen.value = false;
-      router.push("/categories");
       resolve();
     }, 2000);
   });
@@ -100,11 +99,12 @@ async function handleLogin() {
     const response = await useNuxtApp().$axios.post("AddCategory", dataToSend);
     progressMessage.value = "تم إضافة فئة بنجاح";
     isOpen.value = true;
+    router.push("/categories");
     await showAlert();
   } catch (error) {
     console.error(error);
     isOpen.value = true;
-    progressMessage.value = "حدث خطأ";
+    progressMessage.value = "يجب ملئ البيانات";
     await showAlert();
   }
 }

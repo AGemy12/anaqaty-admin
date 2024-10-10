@@ -55,6 +55,7 @@ import { ref } from "vue";
 import Cookies from "js-cookie";
 import AlertModel from "~/components/mini/AlertModel.vue";
 import { useRouter } from "vue-router";
+import { emailRules, passwordRules } from "~/stores/validation";
 
 definePageMeta({
   layout: "reg",
@@ -65,40 +66,11 @@ useHead({
 
 const email = ref("");
 const password = ref("");
-const ProgressMessage = ref("");
 const show1 = ref(false);
+const ProgressMessage = ref("");
 const loading = ref(false);
 const isShowModel = ref(false);
 const router = useRouter();
-
-// ###################################### Start Form Validation =============================================
-
-const emailRules = [
-  (value) => {
-    if (value) return true;
-    return "يجب إدخال البريد الإلكتروني";
-  },
-  (value) => {
-    const emailPattern = /^[a-zA-Z0-9]{2,}@[a-zA-Z]{2,}\.[a-zA-Z]{2,}$/;
-    if (emailPattern.test(value)) return true;
-    return "يجب إدخال بريد إلكتروني صالح";
-  },
-];
-
-const passwordRules = [
-  (value) => {
-    if (value) return true;
-    return "يجب إدخال كلمة المرور";
-  },
-  (value) => {
-    if (value.length >= 6) return true;
-    return "يجب ألا تقل كلمة المرور عن 6 أحرف";
-  },
-];
-
-// ###################################### End Form Validation =============================================
-
-// ###################################### Start Login Notifications Message ===============================
 
 const showAlert = () => {
   return new Promise((resolve) => {
