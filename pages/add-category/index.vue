@@ -38,11 +38,14 @@
 </template>
 
 <script setup>
+// ########################### Start imports ##################################
 import PagesHeader from "~/components/mini/PagesHeader.vue";
 import { ref, watch } from "vue";
 import AlertModel from "~/components/mini/AlertModel.vue";
 import { useRouter } from "vue-router";
+// ########################### End imports ##################################
 
+// ########################### Start Auth And Head Page Details ##################################
 definePageMeta({
   layout: "default",
 
@@ -53,27 +56,38 @@ definePageMeta({
 useHead({
   title: "Anaqaty | اضافة فئة",
 });
+// ########################### End Auth And Head Page Details ##################################
 
+// ########################### Start Consts ##################################
 const router = useRouter();
+const isOpen = ref(false);
+const progressMessage = ref("");
 const category = ref({
   name: "",
   description: "",
   slug: "",
   IsActive: false,
 });
-const isOpen = ref(false);
-const progressMessage = ref("");
+// ########################### End Consts ##################################
+
+// ########################### Start Rmove Spaces And Set (-) Func  ##################################
 
 const convertDescriptionToSlug = (description) => {
   return description.trim().replace(/\s+/g, "-");
 };
+// ########################### End Rmove Spaces And Set (-) Func  ##################################
 
+// ########################### Start Watch To Set Old Slug Value  ##################################
 watch(
   () => category.value.description,
   (newDescription) => {
     category.value.slug = convertDescriptionToSlug(newDescription);
   }
 );
+// ########################### End Watch To Set Old Slug Value  ##################################
+
+// ########################### Start ShoW Alert Func  ##################################
+
 const showAlert = () => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -82,7 +96,9 @@ const showAlert = () => {
     }, 2000);
   });
 };
+// ########################### End ShoW Alert Func  ##################################
 
+// ######################### Start Add Category Request ###############################
 async function handleLogin() {
   try {
     const dataToSend = {
@@ -96,16 +112,19 @@ async function handleLogin() {
       slug: "",
       IsActive: false,
     };
-    const response = await useNuxtApp().$axios.post("AddCategory", dataToSend);
-    progressMessage.value = "تم إضافة فئة بنجاح";
+    const res = await useNuxtApp().$axios.post("AddCategory", dataToSend);
+    progressMessage.value = res.data.message;
     isOpen.value = true;
-    router.push("/categories");
-    await showAlert();
-  } catch (error) {
-    console.error(error);
+    setTimeout(() => {
+      router.push("/categories");
+    }, 2000);
+  } catch (res) {
     isOpen.value = true;
-    progressMessage.value = "يجب ملئ البيانات";
+    progressMessage.value =
+      res.response.data.message || "هناك خطأ في السيرفر يرجى المحاولة لاحقا";
+  } finally {
     await showAlert();
   }
 }
+// ######################### End Add Category Request ###############################
 </script>

@@ -18,23 +18,27 @@
         </v-btn>
       </v-form>
     </v-sheet>
-    <!-- <AlertModel :is-opend="isOpen" :title="progressMessage" /> -->
+    <AlertModel :is-opend="isOpen" :title="progressMessage" />
   </section>
 </template>
 
 <script setup>
-useHead({
-  title: "Anaqaty | تحديث فئة",
-});
-import PagesHeader from "~/components/mini/PagesHeader.vue";
-import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
-// import AlertModel from "~/components/mini/AlertModel.vue";
-
+// #################################### Start Auth And Title Page Details ###################################
 definePageMeta({
   layout: "default",
   middleware: "auth",
 });
+useHead({
+  title: "Anaqaty | تحديث فئة",
+});
+// #################################### End  Auth And Title Page Details ####################################
+
+// #################################### Start Imports And Consts ###################################
+
+import PagesHeader from "~/components/mini/PagesHeader.vue";
+import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import AlertModel from "~/components/mini/AlertModel.vue";
 
 const role = ref({
   title: "",
@@ -44,53 +48,68 @@ const router = useRouter();
 const isOpen = ref(false);
 const progressMessage = ref("");
 
+// #################################### End Imports And Consts ###################################
+
+// #################################### Start Show Alert Model #################################
+const showAlert = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      isOpen.value = false;
+      resolve();
+    }, 2000);
+  });
+};
+
+// #################################### End Show Alert Model ###################################
+
+// #################################### Start Get Roles Request ###################################
 async function fetchRole() {
   try {
-    const response = await useNuxtApp().$axios.get(`roles`);
+    const res = await useNuxtApp().$axios.get(`roles`);
     const index = route.query.index;
 
-    if (response.data.roles && response.data.roles[index]) {
-      role.value = response.data.roles[index];
+    if (res.data.roles && res.data.roles[index]) {
+      role.value = res.data.roles[index];
     }
-  } catch (error) {
-    console.error("خطأ في جلب الفئة:", error);
+  } catch (res) {
+    progressMessage.value =
+      res.response.data.message || "حدث خطأ في السيرفر يرجى المحاولة لاحقا";
+    isOpen.value = true;
+    await showAlert();
   }
 }
+// #################################### End Get Roles Request ###################################
 
-onMounted(async () => {
-  await fetchRole();
-});
-
+// #################################### Start Update Role Request ###################################
 async function fetchUpdateRole() {
   try {
     const id = route.params.id;
-    console.log(id);
-
+    // console.log(id);
     const dataToSend = {
-      ...category.value,
+      ...role.value,
     };
-    const formData = qs.stringify(dataToSend);
-    console.log(dataToSend);
 
-    await useNuxtApp().$axios.put(`UpdateRole/${id}`, formData, {
+    const res = await useNuxtApp().$axios.post(`UpdateRole/${id}`, dataToSend, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
-
-    progressMessage.value = "تم تحديث الدور بنجاح";
+    progressMessage.value = res.data.message;
     isOpen.value = true;
-
     setTimeout(() => {
-      isOpen.value = false;
       router.push("/users/roles");
       route.params = "";
-      window.location.reload();
     }, 2000);
-  } catch (error) {
-    console.error("خطأ في تحديث الدور:", error);
-    progressMessage.value = "حدث خطأ أثناء تحديث الدور";
+  } catch (res) {
+    progressMessage.value =
+      res.response.data.message || "حدث خطأ في السيرفر يرجى المحاولة لاحقا";
     isOpen.value = true;
+    await showAlert();
   }
 }
+// #################################### End Update Role Request ###################################
+
+onMounted(async () => {
+  await fetchRole();
+});
 </script>

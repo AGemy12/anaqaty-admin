@@ -40,11 +40,14 @@
 </template>
 
 <script setup lang="ts">
-// Start <====> Auth Check <====>
+//################################# Start Auth And Head Page Title Details ###############################
 definePageMeta({
   middleware: "auth",
 });
-// End <====> Auth Check <====>
+useHead({
+  title: "إضافة موضوع",
+});
+//################################# Start Auth And Head Page Title Details ###############################
 
 import { onMounted, ref } from "vue";
 import "quill/dist/quill.snow.css"; // تأكد من استيراد CSS

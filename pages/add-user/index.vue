@@ -24,7 +24,7 @@
           @click:append-inner="show1 = !show1"
           class="mb-3"
         ></v-text-field>
-        <v-select
+        <v-autocomplete
           label="اختر دور"
           :items="roles"
           :rules="rolesRules"
@@ -32,7 +32,8 @@
           item-text="name"
           item-value="id"
           class="mb-3"
-        ></v-select>
+          multiple
+        ></v-autocomplete>
 
         <v-btn
           class="mt-0 !bg-black text-white !duration-300 hover:bg-black !tracking-[0]"
@@ -48,67 +49,72 @@
 </template>
 
 <script setup>
+// ######################### Start Imports ############################
 import PagesHeader from "~/components/mini/PagesHeader.vue";
-import { ref, toRaw, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-
 import { nameRules, emailRules, passwordRules } from "~/stores/validation";
 import AlertModel from "~/components/mini/AlertModel.vue";
+// ######################### End Imports ############################
 
+// ######################### Start Auth And Head Page Details ############################
 definePageMeta({
   layout: "default",
 
-  // Start <====> Auth Check <====>
   middleware: "auth",
-  // End <====> Auth Check <====>
 });
 useHead({
   title: "Anaqaty | اضافة مستخدم",
 });
+// ######################### End Auth And Head Page Details ############################
 
+// ######################### End Consts ############################
 const router = useRouter();
 const show1 = ref(false);
 const roles = ref([]);
-const selectedRoleId = ref("");
+const selectedRoleId = ref([]);
 const progressMessage = ref("");
 const isOpen = ref(false);
-const rolesRules = [
-  (value) => {
-    if (value) return true;
-    return "يجب إختيار دور";
-  },
-];
 const userData = ref({
   name: "",
   email: "",
   password: "",
   Roles: "",
 });
+// ######################### End Consts ############################
 
-// ###################################### End Add New User Message ===============================
+// ######################### Start Roles Rule ############################
+const rolesRules = [
+  (value) => {
+    if (value) return true;
+    return "يجب إختيار دور";
+  },
+];
+// ######################### End Roles Rule ############################
 
-// ###################################### Start Get Users Roles Request ==========================
+// ###################################### End Add New User Message ################################
+
+// ###################################### Start Get Users Roles Request ################################
 
 async function fetchGetRoles() {
   try {
     const response = await useNuxtApp().$axios.get("roles");
 
     roles.value = response.data.roles;
-    console.log(roles);
-    console.log("Response Data:", roles);
   } catch (error) {
   } finally {
   }
 }
 
-// ###################################### End Get Users Roles Request ================================
+// ###################################### End Get Users Roles Request ################################
 
+// ###################################### Start Watch Selected Roles ################################
 watch(selectedRoleId, (newRoleId) => {
-  const selectedRole = roles.value.find((role) => role.id === newRoleId);
-
-  userData.value.Roles = selectedRole ? selectedRole.id : null;
-
-  console.log("Selected Role ID:", userData.value.Roles);
+  const selectedRoles = roles.value.filter((role) =>
+    newRoleId.includes(role.id)
+  );
+  userData.value.Roles = selectedRoles.map((role) => role.id);
+  // console.log("Selected Role IDs:", userData.value.Roles);
 });
 
 const showAlert = () => {
@@ -119,8 +125,9 @@ const showAlert = () => {
     }, 2000);
   });
 };
+// ###################################### End Watch Selected Roles ################################
 
-// ###################################### Start Add New User Request ==========================
+// ###################################### Start Add New User Request ##################################
 
 async function fetchAddUser() {
   try {
@@ -139,20 +146,17 @@ async function fetchAddUser() {
       setTimeout(() => {
         router.push("/users");
       }, 2000);
-      await showAlert();
     }
   } catch (res) {
     progressMessage.value =
       res.response.data.message || "حدث خطأ في السيرفر يرجى المحاولة لاخقا";
     isOpen.value = true;
-    setTimeout(() => {
-      router.push("/users");
-    }, 2000);
+  } finally {
     await showAlert();
   }
 }
 
-// ###################################### End Add New User Request ================================
+// ###################################### End Add New User Request ##################################=
 
 onMounted(() => {
   fetchGetRoles();

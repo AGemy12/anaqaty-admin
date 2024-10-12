@@ -1,6 +1,6 @@
 <template>
   <section>
-    <PagesHeader title="تحديث تصنيف" />
+    <PagesHeader title="تحديث فئة" />
     <v-sheet class="mx-auto bg-transparent w-full md:w-1/2">
       <v-form @submit.prevent="fetchUpdateCategory">
         <v-text-field
@@ -38,19 +38,26 @@
 </template>
 
 <script setup>
-useHead({
-  title: "Anaqaty | تحديث فئة",
-});
+// ######################### Start Imports ############################
 import PagesHeader from "~/components/mini/PagesHeader.vue";
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import qs from "qs";
 import AlertModel from "~/components/mini/AlertModel.vue";
+// ######################### End Imports ############################
+
+// ######################### Start Auth And Head Page Details ############################
 
 definePageMeta({
   layout: "default",
   middleware: "auth",
 });
+useHead({
+  title: "Anaqaty | تحديث فئة",
+});
+// ######################### Start Auth And Head Page Details ############################
+
+// ######################### Start Consts ############################
 
 const category = ref({
   name: "",
@@ -63,33 +70,46 @@ const router = useRouter();
 const isOpen = ref(false);
 const progressMessage = ref("");
 
-// دالة لجلب بيانات الفئة
+// ######################### End Consts ############################
+
+// #################################### Start Show Alert Model #################################
+const showAlert = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      isOpen.value = false;
+      resolve();
+    }, 2000);
+  });
+};
+
+//################################## End Show Alert Model ###################################
+
+// ######################### Start Get All Categories Request ############################
 async function fetchCategory() {
   try {
-    const response = await useNuxtApp().$axios.get(`categories`); // جلب جميع الفئات
-    const index = route.query.index; // الحصول على الفهرس من الاستعلام
+    const res = await useNuxtApp().$axios.get(`categories`);
+    const index = route.query.index;
 
-    // تعيين الفئة بناءً على الفهرس
-    if (response.data.categories && response.data.categories[index]) {
-      category.value = response.data.categories[index];
+    if (res.data.categories && res.data.categories[index]) {
+      category.value = res.data.categories[index];
 
       category.value.IsActive = category.value.IsActive === 1;
     }
-  } catch (error) {
-    console.error("خطأ في جلب الفئة:", error);
+  } catch (res) {
+    progressMessage.value =
+      res.response.data.message || "حدث خطأ أثناء تحديث الفئة";
+    isOpen.value = true;
   }
 }
 
-// استرجاع البيانات عند تحميل الصفحة
-onMounted(async () => {
-  await fetchCategory(); // احصل على بيانات الفئة
-});
+// ######################### End Get All Categories Request ############################
 
+// ######################### Start Update Category Request ############################
 async function fetchUpdateCategory() {
   try {
     const index = route.query.index;
     const id = route.params.id;
-    console.log(id);
+    // console.log(id);
 
     const dataToSend = {
       ...category.value,
@@ -108,15 +128,21 @@ async function fetchUpdateCategory() {
     isOpen.value = true;
 
     setTimeout(() => {
-      isOpen.value = false;
       router.push("/categories");
       route.params = "";
       window.location.reload();
     }, 2000);
-  } catch (error) {
-    console.error("خطأ في تحديث الفئة:", error);
-    progressMessage.value = "حدث خطأ أثناء تحديث الفئة";
+  } catch (res) {
+    progressMessage.value =
+      res.response.data.message || "حدث خطأ أثناء تحديث الفئة";
     isOpen.value = true;
+  } finally {
+    await showAlert();
   }
 }
+// ######################### End Update Category Request ############################
+
+onMounted(async () => {
+  await fetchCategory();
+});
 </script>

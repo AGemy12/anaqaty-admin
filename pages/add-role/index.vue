@@ -1,6 +1,6 @@
 <template>
   <section>
-    <PagesHeader title="إضافة مستخدم جديد" />
+    <PagesHeader title="إضافة دور" />
     <v-sheet class="mx-auto bg-transparent w-full md:w-1/2">
       <v-form @submit.prevent="addRoleReq">
         <v-text-field
@@ -23,11 +23,14 @@
 </template>
 
 <script setup>
+// ################################## Start Imports ###############################
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import PagesHeader from "~/components/mini/PagesHeader.vue";
 import AlertModel from "~/components/mini/AlertModel.vue";
+// ################################## Start Imports ###############################
 
+//############################## End Auth And Page Details ###############################
 definePageMeta({
   layout: "default",
 
@@ -39,16 +42,18 @@ useHead({
   title: "Anaqaty | اضافة مستخدم",
 });
 
-// ###################################### End Add New User Message ===============================
+// ###################################### End Auth And Page Details ###############################
 
+// ################################## Start Consts ################################
 const router = useRouter();
 const role = ref({
   title: "",
 });
-
 const isOpen = ref(false);
 const progressMessage = ref("");
+// ################################## End Consts ################################
 
+// #################################### Start Show Alert Model #################################
 const showAlert = () => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -58,7 +63,9 @@ const showAlert = () => {
   });
 };
 
-// ###################################### Start Get Users Roles Request ==========================
+//################################## End Show Alert Model ###################################
+
+//##################################### Start Get Users Roles Request ########################
 
 async function addRoleReq() {
   try {
@@ -67,7 +74,6 @@ async function addRoleReq() {
     if (res.status == 200) {
       progressMessage.value = res.data.message;
       isOpen.value = true;
-      await showAlert();
       setTimeout(() => {
         router.push("/users/roles");
       }, 2000);
@@ -79,9 +85,9 @@ async function addRoleReq() {
     isOpen.value = true;
     progressMessage.value =
       res.response.data.message || "حدث خطأ في السيرفر يرجى المحاولة لاخقا";
+  } finally {
     await showAlert();
   }
 }
-
 // ###################################### End Get Users Roles Request ================================
 </script>
