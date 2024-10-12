@@ -17,8 +17,9 @@
           <th class="text-center text-[12px] md:text-[18px] whitespace-nowrap">
             دور المستخدم
           </th>
+
           <th class="text-center text-[12px] md:text-[18px] whitespace-nowrap">
-            تم الإنشاء في
+            اخر تحديث
           </th>
           <th class="text-center text-[12px] md:text-[18px] whitespace-nowrap">
             خيارات
@@ -47,7 +48,7 @@
             </span>
           </td>
           <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.date }}
+            {{ item.updated_at }}
           </td>
           <td
             class="text-[12px] md:text-[15px] whitespace-nowrap flex items-center justify-center"
