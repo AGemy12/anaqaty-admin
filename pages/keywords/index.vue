@@ -1,7 +1,7 @@
 <template>
   <section>
-    <PagesHeader title="الفئات" />
-    <Button title="إضافة فئة" :fire-click="goToAddCategoryPage" />
+    <PagesHeader title="الكلمات المفتاحية" />
+    <Button title="إضافة كلمة مفتاحية" :fire-click="goToAddKeywordPage" />
     <v-table class="overflow-auto md:w-screen">
       <thead>
         <tr class="text-center">
@@ -28,17 +28,17 @@
       <tbody>
         <tr
           class="cursor-default text-center duration-300 hover:bg-alt"
-          v-for="(item, index) in categoriesData"
+          v-for="(item, index) in keywordsData"
           :key="item.id"
         >
           <td class="text-[12px] md:text-[15px] whitespace-nowrap">
             {{ item.id }}
           </td>
           <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.name }}
+            {{ item.keyword }}
           </td>
           <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.useCounts }}
+            {{ item.usage_count }}
           </td>
           <td class="text-center text-[12px] md:text-[18px] whitespace-nowrap">
             <span
@@ -69,7 +69,7 @@
             </button>
             <button
               class="flex items-center justify-center"
-              @click="confirmDeleteCategory(item.id)"
+              @click="confirmDeleteKeyword(item.id)"
             >
               <Icon
                 name="ic:baseline-delete-outline"
@@ -81,9 +81,9 @@
       </tbody>
     </v-table>
     <AnaqatyModel
-      message-title="هل أنت متأكد من أنك تريد حذف هذه الفئة؟"
+      message-title="هل أنت متأكد من أنك تريد حذف هذه الكملة المفتاحية ؟"
       :model-opend="modeldIsOpend"
-      :fire-clcik-yes="deleteCategory"
+      :fire-clcik-yes="deleteKeyword"
       :fire-clcik-no="cancleDeletePremissionHandel"
     />
     <AlertModel :is-opend="isOpen" :title="progressMessage" />
@@ -91,32 +91,32 @@
 </template>
 
 <script setup>
-// ###################### Start Imports #######################
+// ###################### Start Imports ########################
 import Button from "~/components/mini/Button.vue";
 import PagesHeader from "~/components/mini/PagesHeader.vue";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import AnaqatyModel from "~/components/mini/AnaqatyModel.vue";
 import AlertModel from "~/components/mini/AlertModel.vue";
-// ###################### End Imports #######################
+// ###################### End Imports ########################
 
-// ###################### Start Auth And Head Page Details #######################
+// ###################### Start Auth And Head Page Details ########################
 definePageMeta({
   middleware: "auth",
 });
 useHead({
-  title: "Anaqaty | الفئات",
+  title: "Anaqaty | الكلمات المفتاحية",
 });
-// ###################### End Auth And Head Page Details #######################
+// ###################### End Auth And Head Page Details ########################
 
-// ###################### Start Consts #######################
+// ###################### Start Consts ########################
 const router = useRouter();
-const categoriesData = ref([]);
+const keywordsData = ref([]);
 const modeldIsOpend = ref(false);
-let categoryIdToDelete = ref(null);
-const progressMessage = ref("");
+let keywordIdToDelete = ref(null);
 const isOpen = ref(false);
-// ###################### End Consts #######################
+const progressMessage = ref("");
+// ###################### End Consts ########################
 
 // ########################### Start ShoW Alert Func  ##################################
 
@@ -130,12 +130,12 @@ const showAlert = () => {
 };
 // ########################### End ShoW Alert Func  ##################################
 
-// ###################### Start Get Categories Request #######################
-async function fetchGetCategories() {
+// ###################### Start Get Keyword Request ########################
+async function fetchGetKeywords() {
   try {
-    const res = await useNuxtApp().$axios.get("categories");
+    const res = await useNuxtApp().$axios.get("keywords");
     if (res.status >= 200) {
-      categoriesData.value = res.data.categories;
+      keywordsData.value = res.data.keywords;
     }
   } catch (error) {
     isOpen.value = true;
@@ -143,19 +143,19 @@ async function fetchGetCategories() {
     await showAlert();
   }
 }
-// ###################### End Get Categories Request #######################
+// ###################### Start Get Keyword Request ########################
 
-const goToAddCategoryPage = () => {
-  router.push("/add-category");
+const goToAddKeywordPage = () => {
+  router.push("/add-keyword");
 };
 
 const goToEditPage = (id, index) => {
-  router.push(`/categories/${id}?index=${index}`);
+  router.push(`/keywords/${id}?index=${index}`);
 };
 
-// ###################### Start Detete Category Funcs #################################
-const confirmDeleteCategory = (id) => {
-  categoryIdToDelete.value = id;
+// ###################### Start Delete Keyword Funs ########################
+const confirmDeleteKeyword = (id) => {
+  keywordIdToDelete.value = id;
   modeldIsOpend.value = true;
 };
 
@@ -163,23 +163,25 @@ const cancleDeletePremissionHandel = () => {
   modeldIsOpend.value = false;
 };
 
-const deleteCategory = async () => {
-  if (categoryIdToDelete.value) {
+const deleteKeyword = async () => {
+  if (keywordIdToDelete.value) {
     try {
-      await useNuxtApp().$axios.delete(
-        `DeleteCategory/${categoryIdToDelete.value}`
+      const res = await useNuxtApp().$axios.delete(
+        `Deletekeyword/${keywordIdToDelete.value}`
       );
-      await fetchGetCategories();
+      await fetchGetKeywords();
       modeldIsOpend.value = false;
+      isOpen.value = true;
+      progressMessage.value = res.data.message;
       await showAlert();
-    } catch (error) {
-      console.error("Error deleting category:", error);
+    } catch (res) {
+      progressMessage.value = res.response.data.message;
     }
   }
 };
-// ###################### End Detete Category Funcs #################################
+// ###################### End Delete Keyword Funs ########################
 
 onMounted(() => {
-  fetchGetCategories();
+  fetchGetKeywords();
 });
 </script>

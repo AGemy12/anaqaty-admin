@@ -1,26 +1,21 @@
 <template>
   <section>
-    <PagesHeader title="إضافة فئة جديدة" />
+    <PagesHeader title="تحديث وسم" />
     <v-sheet class="mx-auto bg-transparent w-full md:w-1/2">
-      <v-form @submit.prevent="handleLogin">
+      <v-form @submit.prevent="fetchUpdateTag">
         <v-text-field
-          v-model="category.name"
-          label="إسم الفئة"
+          v-model="tag.name"
+          label="العنوان"
           class="mb-4"
         ></v-text-field>
         <v-text-field
-          v-model="category.description"
-          label="وصف الفئة"
-          class="mb-4"
-        ></v-text-field>
-        <v-text-field
-          v-model="category.slug"
-          label="شكل الفئة في الرابط"
+          v-model="tag.slug"
+          label="الشكل في الرابط"
           class="mb-4"
         ></v-text-field>
         <v-switch
-          v-model="category.IsActive"
-          label="تفعيل الفئة"
+          v-model="tag.IsActive"
+          label="تفعيل الكلمة المفتاحية"
           color="primary"
         ></v-switch>
 
@@ -29,7 +24,7 @@
           type="submit"
           block
         >
-          إضافة فئة
+          تحديث
         </v-btn>
       </v-form>
     </v-sheet>
@@ -40,9 +35,10 @@
 <script setup>
 // ########################### Start imports ##################################
 import PagesHeader from "~/components/mini/PagesHeader.vue";
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import AlertModel from "~/components/mini/AlertModel.vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
+
 // ########################### End imports ##################################
 
 // ########################### Start Auth And Head Page Details ##################################
@@ -54,17 +50,17 @@ definePageMeta({
   // End <====> Auth Check <====>
 });
 useHead({
-  title: "Anaqaty | اضافة فئة",
+  title: "Anaqaty | تحديث وسم",
 });
 // ########################### End Auth And Head Page Details ##################################
 
 // ########################### Start Consts ##################################
 const router = useRouter();
+const route = useRoute();
 const isOpen = ref(false);
 const progressMessage = ref("");
-const category = ref({
+const tag = ref({
   name: "",
-  description: "",
   slug: "",
   IsActive: false,
 });
@@ -72,16 +68,16 @@ const category = ref({
 
 // ########################### Start Rmove Spaces And Set (-) Func  ##################################
 
-const convertDescriptionToSlug = (description) => {
-  return description.trim().replace(/\s+/g, "-");
+const convertTagToSlug = (name) => {
+  return name.trim().replace(/\s+/g, "-");
 };
 // ########################### End Rmove Spaces And Set (-) Func  ##################################
 
 // ########################### Start Watch To Set Old Slug Value  ##################################
 watch(
-  () => category.value.description,
-  (newDescription) => {
-    category.value.slug = convertDescriptionToSlug(newDescription);
+  () => tag.value.name,
+  (newTag) => {
+    tag.value.slug = convertTagToSlug(newTag);
   }
 );
 // ########################### End Watch To Set Old Slug Value  ##################################
@@ -98,33 +94,62 @@ const showAlert = () => {
 };
 // ########################### End ShoW Alert Func  ##################################
 
-// ######################### Start Add Category Request ###############################
-async function handleLogin() {
+// ######################### Start Get Keywords Request ###############################
+async function fetchGetTags() {
   try {
+    const res = await useNuxtApp().$axios.get(`tags`);
+    const index = route.query.index;
+
+    if (res.data.Tags && res.data.Tags[index]) {
+      tag.value = res.data.Tags[index];
+      tag.value.IsActive = tag.value.IsActive === 1;
+    }
+  } catch (res) {
+    progressMessage.value =
+      res.response.data.message || "حدث خطأ في السيرفر يرجى المحاولة لاحقا";
+    isOpen.value = true;
+    await showAlert();
+  }
+}
+// ######################### End Add Keyword Request ###############################
+
+// ######################### Start Update Keyword Request ############################
+async function fetchUpdateTag() {
+  try {
+    const index = route.query.index;
+    const id = route.params.id;
+    // console.log(id);
+
     const dataToSend = {
-      ...category.value,
-      isActive: category.value.IsActive ? 1 : 0,
+      ...tag.value,
+      IsActive: tag.value.IsActive ? 1 : 0,
     };
 
-    category.value = {
-      name: "",
-      description: "",
-      slug: "",
-      IsActive: false,
-    };
-    const res = await useNuxtApp().$axios.post("AddCategory", dataToSend);
+    const res = await useNuxtApp().$axios.put(`Updatetag/${id}`, dataToSend, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+
     progressMessage.value = res.data.message;
     isOpen.value = true;
+
     setTimeout(() => {
-      router.push("/categories");
+      router.push("/tags");
+      route.params = "";
+      window.location.reload();
     }, 2000);
   } catch (res) {
-    isOpen.value = true;
     progressMessage.value =
-      res.response.data.message || "هناك خطأ في السيرفر يرجى المحاولة لاحقا";
+      res.response.data.message || "حدث خطأ أثناء تحديث الوسم ";
+    isOpen.value = true;
   } finally {
     await showAlert();
   }
 }
-// ######################### End Add Category Request ###############################
+// ######################### End Update Keyword Request ############################
+
+onMounted(() => {
+  fetchGetTags();
+});
 </script>

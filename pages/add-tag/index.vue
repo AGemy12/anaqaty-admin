@@ -1,26 +1,26 @@
 <template>
   <section>
-    <PagesHeader title="إضافة فئة جديدة" />
+    <PagesHeader title="إضافة وسم" />
     <v-sheet class="mx-auto bg-transparent w-full md:w-1/2">
-      <v-form @submit.prevent="handleLogin">
+      <v-form @submit.prevent="fetchAddTag">
         <v-text-field
-          v-model="category.name"
-          label="إسم الفئة"
+          v-model="tag.name"
+          label="العنوان"
           class="mb-4"
         ></v-text-field>
+        <!-- <v-text-field
+            v-model="tag.meta_keywords"
+            label="الكلمة الدلالية"
+            class="mb-4"
+          ></v-text-field> -->
         <v-text-field
-          v-model="category.description"
-          label="وصف الفئة"
-          class="mb-4"
-        ></v-text-field>
-        <v-text-field
-          v-model="category.slug"
-          label="شكل الفئة في الرابط"
+          v-model="tag.slug"
+          label="الشكل في الرابط"
           class="mb-4"
         ></v-text-field>
         <v-switch
-          v-model="category.IsActive"
-          label="تفعيل الفئة"
+          v-model="tag.IsActive"
+          label="تفعيل الوسم"
           color="primary"
         ></v-switch>
 
@@ -29,7 +29,7 @@
           type="submit"
           block
         >
-          إضافة فئة
+          إضافة وسم
         </v-btn>
       </v-form>
     </v-sheet>
@@ -54,7 +54,7 @@ definePageMeta({
   // End <====> Auth Check <====>
 });
 useHead({
-  title: "Anaqaty | اضافة فئة",
+  title: "Anaqaty | اضافة وسم ",
 });
 // ########################### End Auth And Head Page Details ##################################
 
@@ -62,9 +62,9 @@ useHead({
 const router = useRouter();
 const isOpen = ref(false);
 const progressMessage = ref("");
-const category = ref({
+const tag = ref({
   name: "",
-  description: "",
+  //   meta_keywords: "",
   slug: "",
   IsActive: false,
 });
@@ -72,16 +72,16 @@ const category = ref({
 
 // ########################### Start Rmove Spaces And Set (-) Func  ##################################
 
-const convertDescriptionToSlug = (description) => {
-  return description.trim().replace(/\s+/g, "-");
+const convertDescriptionToSlug = (name) => {
+  return name.trim().replace(/\s+/g, "-");
 };
 // ########################### End Rmove Spaces And Set (-) Func  ##################################
 
 // ########################### Start Watch To Set Old Slug Value  ##################################
 watch(
-  () => category.value.description,
-  (newDescription) => {
-    category.value.slug = convertDescriptionToSlug(newDescription);
+  () => tag.value.name,
+  (newTag) => {
+    tag.value.slug = convertDescriptionToSlug(newTag);
   }
 );
 // ########################### End Watch To Set Old Slug Value  ##################################
@@ -92,32 +92,33 @@ const showAlert = () => {
   return new Promise((resolve) => {
     setTimeout(() => {
       isOpen.value = false;
+      router.push("/tags");
       resolve();
     }, 2000);
   });
 };
 // ########################### End ShoW Alert Func  ##################################
 
-// ######################### Start Add Category Request ###############################
-async function handleLogin() {
+// ######################### Start Add Keyword Request ###############################
+async function fetchAddTag() {
   try {
     const dataToSend = {
-      ...category.value,
-      isActive: category.value.IsActive ? 1 : 0,
+      ...tag.value,
+      isActive: tag.value.IsActive ? 1 : 0,
     };
 
-    category.value = {
-      name: "",
-      description: "",
-      slug: "",
-      IsActive: false,
-    };
-    const res = await useNuxtApp().$axios.post("AddCategory", dataToSend);
-    progressMessage.value = res.data.message;
-    isOpen.value = true;
-    setTimeout(() => {
-      router.push("/categories");
-    }, 2000);
+    const res = await useNuxtApp().$axios.post("AddTag", dataToSend);
+    if (res.status >= 200) {
+      isOpen.value = true;
+      progressMessage.value = res.data.message;
+      await showAlert();
+      tag.value = {
+        keyword: "",
+        description: "",
+        slug: "",
+        IsActive: false,
+      };
+    }
   } catch (res) {
     isOpen.value = true;
     progressMessage.value =
@@ -126,5 +127,5 @@ async function handleLogin() {
     await showAlert();
   }
 }
-// ######################### End Add Category Request ###############################
+// ######################### End Add Keyword Request ###############################
 </script>

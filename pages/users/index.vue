@@ -17,7 +17,6 @@
           <th class="text-center text-[12px] md:text-[18px] whitespace-nowrap">
             دور المستخدم
           </th>
-
           <th class="text-center text-[12px] md:text-[18px] whitespace-nowrap">
             اخر تحديث
           </th>
@@ -86,29 +85,45 @@
 </template>
 
 <script setup>
-// Start <====> Auth Check <====>
-definePageMeta({
-  middleware: "auth",
-});
-useHead({
-  title: "Anaqaty | المستخدمين",
-});
-// End <====> Auth Check <====>
+// ###################################### Start Imports #################################
 import Button from "~/components/mini/Button.vue";
 import { useRouter } from "vue-router";
 import { ref, onMounted } from "vue";
 import PagesHeader from "~/components/mini/PagesHeader.vue";
 import AnaqatyModel from "~/components/mini/AnaqatyModel.vue";
 import AlertModel from "~/components/mini/AlertModel.vue";
+// ###################################### End Imports #################################
 
+// ###################################### Start Auth And Head Page Details #################################
+definePageMeta({
+  middleware: "auth",
+});
+useHead({
+  title: "Anaqaty | المستخدمين",
+});
+// ###################################### End Auth And Head Page Details #################################
+
+// ###################################### Start Consts #################################
 const router = useRouter();
 const usersData = ref([]);
 let userIdToDelete = ref(null);
 const modeldIsOpend = ref(false);
 const deletedMessage = ref("");
 const modelOpend = ref(false);
-// ###################################### Start Get Users Request ===========================================
+// ###################################### End Consts #################################
 
+// ###################################### Start Show Alert Func #################################
+const showAlert = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      modelOpend.value = false;
+      resolve();
+    }, 2000);
+  });
+};
+// ###################################### End Show Alert Func #################################
+
+// ###################################### Start Get Users Request #################################
 async function fetchGetUsers() {
   try {
     const res = await useNuxtApp().$axios.get("users");
@@ -122,17 +137,9 @@ async function fetchGetUsers() {
   } catch (error) {}
 }
 
-// ###################################### End  Get Users Request =============================================
+// ###################################### End  Get Users Request ###################################
 
-const showAlert = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      modelOpend.value = false;
-      resolve();
-    }, 2000);
-  });
-};
-
+// ###################################### Start  Delete User Request ###################################
 const handelDeletUser = (id) => {
   userIdToDelete.value = id;
   modeldIsOpend.value = true;
@@ -159,6 +166,7 @@ const deleteUser = async () => {
   }
 };
 
+// ###################################### End   Delete User Request ###################################
 const goToEditPage = (id, index) => {
   router.push(`/users/${id}?index=${index}`);
 };

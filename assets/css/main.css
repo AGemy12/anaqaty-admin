@@ -33,6 +33,7 @@ body {
   top: 0;
   right: 300px;
   width: calc(100% - 300px);
+  min-height: 100vh;
   padding: 20px;
 }
 

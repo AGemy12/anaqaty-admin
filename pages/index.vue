@@ -1,5 +1,7 @@
 <template>
-  <section class="flex justify-center items-center h-screen">
+  <section
+    class="flex justify-center items-center h-[calc(100vh-40px)] overflow-hidden"
+  >
     <div class="max-w-[400px] mx-auto">
       <img src="/black_logo.svg" alt="لوجو الموقع" />
     </div>

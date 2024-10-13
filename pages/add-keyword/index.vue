@@ -1,26 +1,26 @@
 <template>
   <section>
-    <PagesHeader title="إضافة فئة جديدة" />
+    <PagesHeader title="إضافة كلمة مفتاحية جديدة" />
     <v-sheet class="mx-auto bg-transparent w-full md:w-1/2">
-      <v-form @submit.prevent="handleLogin">
+      <v-form @submit.prevent="fetchAddKeyword">
         <v-text-field
-          v-model="category.name"
-          label="إسم الفئة"
+          v-model="keyword.keyword"
+          label="العنوان"
           class="mb-4"
         ></v-text-field>
-        <v-text-field
-          v-model="category.description"
-          label="وصف الفئة"
+        <!-- <v-text-field
+          v-model="keyword.meta_keywords"
+          label="الكلمة الدلالية"
           class="mb-4"
-        ></v-text-field>
+        ></v-text-field> -->
         <v-text-field
-          v-model="category.slug"
-          label="شكل الفئة في الرابط"
+          v-model="keyword.slug"
+          label="الشكل في الرابط"
           class="mb-4"
         ></v-text-field>
         <v-switch
-          v-model="category.IsActive"
-          label="تفعيل الفئة"
+          v-model="keyword.IsActive"
+          label="تفعيل الكلمة المفتاحية"
           color="primary"
         ></v-switch>
 
@@ -29,7 +29,7 @@
           type="submit"
           block
         >
-          إضافة فئة
+          إضافة كلمة مفتاحية
         </v-btn>
       </v-form>
     </v-sheet>
@@ -54,7 +54,7 @@ definePageMeta({
   // End <====> Auth Check <====>
 });
 useHead({
-  title: "Anaqaty | اضافة فئة",
+  title: "Anaqaty | اضافة كلمة مفتاحية",
 });
 // ########################### End Auth And Head Page Details ##################################
 
@@ -62,9 +62,9 @@ useHead({
 const router = useRouter();
 const isOpen = ref(false);
 const progressMessage = ref("");
-const category = ref({
+const keyword = ref({
   name: "",
-  description: "",
+  //   meta_keywords: "",
   slug: "",
   IsActive: false,
 });
@@ -79,9 +79,9 @@ const convertDescriptionToSlug = (description) => {
 
 // ########################### Start Watch To Set Old Slug Value  ##################################
 watch(
-  () => category.value.description,
+  () => keyword.value.keyword,
   (newDescription) => {
-    category.value.slug = convertDescriptionToSlug(newDescription);
+    keyword.value.slug = convertDescriptionToSlug(newDescription);
   }
 );
 // ########################### End Watch To Set Old Slug Value  ##################################
@@ -98,26 +98,26 @@ const showAlert = () => {
 };
 // ########################### End ShoW Alert Func  ##################################
 
-// ######################### Start Add Category Request ###############################
-async function handleLogin() {
+// ######################### Start Add Keyword Request ###############################
+async function fetchAddKeyword() {
   try {
     const dataToSend = {
-      ...category.value,
-      isActive: category.value.IsActive ? 1 : 0,
+      ...keyword.value,
+      isActive: keyword.value.IsActive ? 1 : 0,
     };
 
-    category.value = {
-      name: "",
+    const res = await useNuxtApp().$axios.post("Addkeyword", dataToSend);
+    progressMessage.value = res.data.message;
+    isOpen.value = true;
+    setTimeout(() => {
+      router.push("/keywords");
+    }, 2000);
+    keyword.value = {
+      keyword: "",
       description: "",
       slug: "",
       IsActive: false,
     };
-    const res = await useNuxtApp().$axios.post("AddCategory", dataToSend);
-    progressMessage.value = res.data.message;
-    isOpen.value = true;
-    setTimeout(() => {
-      router.push("/categories");
-    }, 2000);
   } catch (res) {
     isOpen.value = true;
     progressMessage.value =
@@ -126,5 +126,5 @@ async function handleLogin() {
     await showAlert();
   }
 }
-// ######################### End Add Category Request ###############################
+// ######################### End Add Keyword Request ###############################
 </script>

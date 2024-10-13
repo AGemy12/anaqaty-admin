@@ -105,20 +105,20 @@ const mainNavLinks = ref([
   {
     id: 2,
     mainTitle: "الكلمات المفتاحية",
-    mainIcon: "oui:token-keyword",
+    mainIcon: "bi:tags-fill",
     arrowIcon: "material-symbols:keyboard-arrow-left",
     nestedNavLinks: [
       {
         id: 1,
-        title: "إضافة",
-        addIcon: "material-symbols:add",
-        path: "##",
+        title: "الكلمات المفتاحية",
+        addIcon: "oui:token-keyword",
+        path: "/keywords",
       },
       {
         id: 2,
-        title: "الكلمات المفتاحية",
-        addIcon: "oui:token-keyword",
-        path: "##",
+        title: "الأوسمة",
+        addIcon: "bi:tags-fill",
+        path: "/tags",
       },
     ],
   },

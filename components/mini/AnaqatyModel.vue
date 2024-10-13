@@ -4,17 +4,17 @@
     v-if="modelOpend"
   >
     <div
-      class="w-[300px] md:w-[400px] h-[150px] bg-white shadow-shadow rounded-md flex flex-col justify-center items-center gap-7"
+      class="w-[300px] md:w-[500px] h-[200px] bg-white shadow-shadow rounded-md flex flex-col justify-center items-center gap-7"
     >
       <!-- <h1 class="w-fit mx-auto font-bold text-[red]">
         هل أنت متأكد من أنك تريد حذف هذه الفئة؟
       </h1> -->
       <h1
-        class="w-fit mx-auto text-[14px] md:text-[16px] font-bold flex items-center justify-center gap-2"
+        class="w-fit mx-auto text-[13px] md:text-[16px] font-bold flex items-center justify-center gap-2"
       >
         <Icon
           name="solar:danger-triangle-linear"
-          class="text-[red] text-[25px]"
+          class="text-[red] text-[30px]"
         />
         <span> {{ messageTitle }}</span>
       </h1>
