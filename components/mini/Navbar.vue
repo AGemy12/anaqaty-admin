@@ -1,5 +1,19 @@
 <template>
   <ul class="my-[2rem]">
+    <li class="overflow-hidden mb-[0.75rem]" @click="closeMenu">
+      <nuxt-link
+        to="/topics"
+        class="p-3 flex justify-between items-center w-full duration-300 hover:bg-alt rounded-md cursor-pointer"
+      >
+        <div class="flex justify-start items-center gap-2">
+          <Icon
+            name="material-symbols:news-outline-rounded"
+            class="text-[1.5rem]"
+          />
+          <span> الموضوعات </span>
+        </div>
+      </nuxt-link>
+    </li>
     <li
       class="overflow-hidden mb-[0.75rem]"
       v-for="link in mainNavLinks"
@@ -81,29 +95,30 @@ const navStore = useNavStore();
 
 const { openItem, toggleItem } = navStore;
 
+// {
+//     id: 1,
+//     mainTitle: "الموضوعات",
+//     mainIcon: "material-symbols:news-outline-rounded",
+//     arrowIcon: "material-symbols:keyboard-arrow-left",
+//     nestedNavLinks: [
+//       {
+//         id: 1,
+//         title: "إضافة موضوع",
+//         addIcon: "material-symbols:add",
+//         path: "/add-topic",
+//       },
+//       {
+//         id: 2,
+//         title: "قائمة الموضوعات",
+//         addIcon: "material-symbols:news-outline-rounded",
+//         path: "/topics-list",
+//       },
+//     ],
+//   },
+
 const mainNavLinks = ref([
   {
     id: 1,
-    mainTitle: "الموضوعات",
-    mainIcon: "material-symbols:news-outline-rounded",
-    arrowIcon: "material-symbols:keyboard-arrow-left",
-    nestedNavLinks: [
-      {
-        id: 1,
-        title: "إضافة موضوع",
-        addIcon: "material-symbols:add",
-        path: "/add-topic",
-      },
-      {
-        id: 2,
-        title: "قائمة الموضوعات",
-        addIcon: "material-symbols:news-outline-rounded",
-        path: "/topics-list",
-      },
-    ],
-  },
-  {
-    id: 2,
     mainTitle: "الكلمات المفتاحية",
     mainIcon: "bi:tags-fill",
     arrowIcon: "material-symbols:keyboard-arrow-left",
@@ -123,7 +138,7 @@ const mainNavLinks = ref([
     ],
   },
   {
-    id: 3,
+    id: 2,
     mainTitle: "المستخدمين",
     mainIcon: "mage:users-fill",
     arrowIcon: "material-symbols:keyboard-arrow-left",

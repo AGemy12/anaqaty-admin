@@ -1,7 +1,7 @@
 <template>
   <section>
-    <PagesHeader title="إضافة موضوع جديد" />
-    <v-sheet class="mx-auto bg-transparent w-full md:w-3/4">
+    <PagesHeader title="تعديل موضوع" />
+    <v-sheet class="mx-auto bg-transparent w-full md:w-1/2">
       <v-form @submit.prevent>
         <v-text-field
           v-model="topicData.title"
@@ -44,8 +44,10 @@
           label="الصورة الرئيسية"
           v-model="topicData.image"
         ></v-file-input>
-        <TextEditor @topic-body="handleTopicBody" />
-
+        <TextEditor
+          :content="topicData.content"
+          @topic-body="handleTopicBody"
+        />
         <v-textarea label="الملخص" v-model="topicData.summary"></v-textarea>
         <v-switch
           v-model="topicData.IsActive"
@@ -57,14 +59,14 @@
           class="flex items-center justify-center gap-4 max-w-[250px] mx-auto"
         >
           <Button
-            :fire-click="handlePublishTopic"
-            title="نشر"
-            addStyle="w-[100px] text-[15px] md:text-[18px] bg-black"
+            :fire-click="handleUpdateAndPublishTopic"
+            title="تعديل ونشر"
+            addStyle="text-[15px] md:text-[16px] bg-black"
           />
           <Button
-            :fire-click="handleDraftedTopic"
-            title="حفظ"
-            addStyle="w-[100px] text-[15px] md:text-[18px] "
+            :fire-click="handleUpdateAndDraftedTopic"
+            title=" تعديل وحفظ"
+            addStyle="text-[15px] md:text-[16px] "
           />
         </div>
       </v-form>
@@ -74,34 +76,34 @@
 </template>
 
 <script setup>
-// ######################### Start Imports ############################
+// #################################### Start Imports  #################################
+
 import PagesHeader from "~/components/mini/PagesHeader.vue";
 import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import AlertModel from "~/components/mini/AlertModel.vue";
 import Button from "~/components/mini/Button.vue";
-
 import TextEditor from "~/components/mini/TextEditor.vue";
-// ######################### End Imports ############################
+// #################################### End Imports  #################################
 
-// ######################### Start Auth And Head Page Details ############################
+// #################################### Start Auth And Head Page Details #################################
 definePageMeta({
   layout: "default",
-
   middleware: "auth",
 });
 useHead({
-  title: "Anaqaty | اضافة موضوع",
+  title: "Anaqaty | تعديل موضوع",
 });
-// ######################### End Auth And Head Page Details ############################
+// #################################### End Auth And Head Page Details #################################
 
 // ######################### End Consts ############################
 const router = useRouter();
+const route = useRoute();
 const tagsData = ref([]);
 const categories = ref([]);
 const keywords = ref([]);
 const selectedTagId = ref([]);
-const selectedCategoryId = ref([]);
+const selectedCategoryId = ref("");
 const selectedKeywordId = ref([]);
 const progressMessage = ref("");
 const isOpen = ref(false);
@@ -118,16 +120,7 @@ const topicData = ref({
 });
 // ######################### End Consts ############################
 
-// ######################### Start Roles Rule ############################
-// const notEmptyRule = [
-//   (value) => {
-//     if (value) return true;
-//     return "لا يجب ان يكون هذا الحقل فارغا";
-//   },
-// ];
-// ######################### End Roles Rule ############################
-
-// ###################################### Start Show Alert Func ################################
+// #################################### Start Show Alert Model #################################
 const showAlert = () => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -136,7 +129,8 @@ const showAlert = () => {
     }, 2000);
   });
 };
-// ###################################### End Show Alert Func ################################
+
+//################################## End Show Alert Model ###################################
 
 // ########################### Start Rmove Spaces And Set (-) Func  ##################################
 
@@ -158,19 +152,19 @@ watch(
       newTagId.includes(tag.id)
     );
     topicData.value.tags = selectedTags.map((tag) => tag.id);
-    console.log("Selected Tag IDs:", topicData.value.tags);
+    // console.log("Selected Tag IDs:", topicData.value.tags);
 
     const selectedKeywords = keywords.value.filter((keyword) =>
       newKeywordId.includes(keyword.id)
     );
     topicData.value.keywords = selectedKeywords.map((keyword) => keyword.id);
-    console.log("Selected Keyword IDs:", topicData.value.keywords);
+    // console.log("Selected Keyword IDs:", topicData.value.keywords);
 
     const selectedCategory = categories.value.find(
       (category) => category.id === newCategoryId
     );
     topicData.value.category_id = selectedCategory ? selectedCategory.id : null;
-    console.log("Selected Category ID:", topicData.value.category_id);
+    // console.log("Selected Category ID:", topicData.value.category_id);
 
     topicData.value.slug = convertTitleToSlug(newSlugTitle);
   }
@@ -200,6 +194,26 @@ async function getAllData() {
 }
 // ###################################### End Get All Data Request ################################
 
+// ###################################### Start Get All Roles Request ###########################
+
+async function getTopics() {
+  try {
+    const res = await useNuxtApp().$axios.get(`articles`);
+    const index = route.query.index;
+
+    if (res.status >= 200) {
+      topicData.value = res.data.articles[index];
+      selectedCategoryId.value = res.data.articles[index].category;
+      selectedKeywordId.value = res.data.articles[index].keywords;
+      selectedTagId.value = res.data.articles[index].tags;
+      console.log(topicData.value);
+    }
+  } catch (error) {
+    console.error("خطأ في جلب الفئة:", error);
+  }
+}
+// ###################################### End Get All Roles Request ############################
+
 // ###################################### Start Recive Topic Content ################################
 const handleTopicBody = (content) => {
   topicData.value.content = content;
@@ -208,14 +222,16 @@ const handleTopicBody = (content) => {
 
 // ###################################### Start Add New User Request ##################################
 
-async function handlePublishTopic() {
+async function handleUpdateAndPublishTopic() {
   try {
+    const id = route.params.id;
+
     const formData = new FormData();
     formData.append("title", topicData.value.title);
     formData.append("slug", topicData.value.slug);
     formData.append("content", topicData.value.content);
     formData.append("summary", topicData.value.summary);
-    formData.append("category_id", selectedCategoryId.value);
+    formData.append("category_id", selectedCategoryId.value.id);
     const isActiveValue = topicData.value.IsActive ? 1 : 0;
     formData.append("IsActive", isActiveValue);
 
@@ -227,66 +243,19 @@ async function handlePublishTopic() {
       formData.append("tags[]", tagId);
     });
 
-    // إرسال الصورة إذا كانت موجودة
     if (topicData.value.image) {
       formData.append("image", topicData.value.image);
     }
 
     const res = await useNuxtApp().$axios.post(
-      "AddPublishedarticle",
+      `UpdateAndPublish/${id}`,
       formData,
       {
         headers: {
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/x-www-form-urlencoded",
         },
       }
     );
-    if (res.status === 200) {
-      progressMessage.value = res.data.message;
-      isOpen.value = true;
-      setTimeout(() => {
-        router.push("/topics");
-      }, 2000);
-      console.log(formData);
-    }
-  } catch (res) {
-    progressMessage.value =
-      res.response.data.message || "حدث خطأ في السيرفر يرجى المحاولة لاخقا";
-    isOpen.value = true;
-  } finally {
-    await showAlert();
-  }
-}
-
-async function handleDraftedTopic() {
-  try {
-    const formData = new FormData();
-    formData.append("title", topicData.value.title);
-    formData.append("slug", topicData.value.slug);
-    formData.append("content", topicData.value.content);
-    formData.append("summary", topicData.value.summary);
-    formData.append("category_id", selectedCategoryId.value);
-    const isActiveValue = topicData.value.IsActive ? 1 : 0;
-    formData.append("IsActive", isActiveValue);
-
-    selectedKeywordId.value.forEach((keywordId) => {
-      formData.append("keywords[]", keywordId);
-    });
-
-    selectedTagId.value.forEach((tagId) => {
-      formData.append("tags[]", tagId);
-    });
-
-    // إرسال الصورة إذا كانت موجودة
-    if (topicData.value.image) {
-      formData.append("image", topicData.value.image);
-    }
-
-    const res = await useNuxtApp().$axios.post("AddDraftarticle", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
     console.log(formData);
     if (res.status === 200) {
       progressMessage.value = res.data.message;
@@ -304,16 +273,64 @@ async function handleDraftedTopic() {
   }
 }
 
-// ###################################### End Add New User Request ##################################
+async function handleUpdateAndDraftedTopic() {
+  try {
+    const id = route.params.id;
 
-onMounted(() => {
-  getAllData();
-});
-</script>
+    const formData = new FormData();
+    formData.append("title", topicData.value.title);
+    formData.append("slug", topicData.value.slug);
+    formData.append("content", topicData.value.content);
+    formData.append("summary", topicData.value.summary);
+    formData.append("category_id", selectedCategoryId.value.id);
+    const isActiveValue = topicData.value.IsActive ? 1 : 0;
+    formData.append("IsActive", isActiveValue);
 
-<style lang="css">
-#editor {
-  height: 400px;
-  width: 100%;
+    selectedKeywordId.value.forEach((keywordId) => {
+      formData.append("keywords[]", keywordId);
+    });
+
+    selectedTagId.value.forEach((tagId) => {
+      formData.append("tags[]", tagId);
+    });
+
+    // إرسال الصورة إذا كانت موجودة
+    if (topicData.value.image) {
+      formData.append("image", topicData.value.image);
+    }
+
+    const res = await useNuxtApp().$axios.post(
+      `UpdateAndDraft/${id}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    console.log(formData);
+    if (res.status === 200) {
+      progressMessage.value = res.data.message;
+      isOpen.value = true;
+      setTimeout(() => {
+        router.push("/topics");
+      }, 2000);
+    }
+  } catch (res) {
+    progressMessage.value =
+      res.response.data.message || "حدث خطأ في السيرفر يرجى المحاولة لاخقا";
+    isOpen.value = true;
+  } finally {
+    await showAlert();
+  }
 }
-</style>
+
+// ###################################### End Add New User Request ##################################=
+
+onMounted(async () => {
+  await getAllData();
+  await getTopics();
+});
+
+// ###################################### End Update User Request ===============================
+</script>

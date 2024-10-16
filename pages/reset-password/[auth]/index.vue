@@ -10,7 +10,7 @@
         إعادة تعيين كلمة المرور
       </h1>
       <v-sheet class="mx-auto bg-transparent w-full">
-        <v-form @submit.prevent>
+        <v-form @submit.prevent="handleResetPass">
           <v-text-field
             v-model="email"
             :rules="emailRules"
@@ -23,18 +23,8 @@
             :rules="passwordRules"
             :append-inner-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
             :type="show1 ? 'text' : 'password'"
-            label="كلمة المرور"
+            label="كلمة المرور الجديدة"
             @click:append-inner="show1 = !show1"
-            class="mb-3"
-          ></v-text-field>
-
-          <v-text-field
-            v-model="confirmPassword"
-            :rules="confirmPasswordRules"
-            :append-inner-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="show2 ? 'text' : 'password'"
-            label="تأكيد كلمة المرور"
-            @click:append-inner="show2 = !show2"
             class="mb-3"
           ></v-text-field>
 
@@ -48,23 +38,29 @@
         </v-form>
       </v-sheet>
     </div>
+    <AlertModel :is-opend="isOpen" :title="progressMessage" />
   </section>
 </template>
 
 <script setup>
 definePageMeta({
   layout: "reg",
-  middleware: "auth",
+});
+useHead({
+  title: "Anaqaty | إعادة تعيين كلمة المرور",
 });
 import Logo from "~/components/mini/Logo.vue";
-import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+import { ref } from "vue";
+import AlertModel from "~/components/mini/AlertModel.vue";
 
+const router = useRouter();
+const isOpen = ref(false);
+const progressMessage = ref("");
 const email = ref("");
 const password = ref("");
-const confirmPassword = ref("");
 
 const show1 = ref(false);
-const show2 = ref(false);
 
 const emailRules = [
   (value) => {
@@ -89,20 +85,40 @@ const passwordRules = [
   },
 ];
 
-const confirmPasswordRules = computed(() => {
-  return [
-    (value) => {
-      if (value) return true;
-      return "يجب إدخال كلمة المرور";
-    },
-    (value) => {
-      if (value.length >= 6) return true;
-      return "يجب ألا تقل كلمة المرور عن 6 أحرف";
-    },
-    (value) => {
-      if (value === password.value) return true;
-      return "كلمة المرور وتأكيد كلمة المرور غير متطابقتين";
-    },
-  ];
-});
+// ###################################### Start Show Alert Func ################################
+const showAlert = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      isOpen.value = false;
+      resolve();
+    }, 2000);
+  });
+};
+// ###################################### End Show Alert Func ################################
+
+async function handleResetPass() {
+  try {
+    const res = await useNuxtApp().$axios.post("Updatepassword", {
+      email: email.value,
+      password: password.value,
+    });
+
+    if (res.status >= 200) {
+      isOpen.value = true;
+      progressMessage.value = res.data.message;
+      await showAlert();
+      router.push("/");
+      email.value = "";
+      password.value = "";
+    } else {
+      isOpen.value = true;
+      progressMessage.value = res.data.message;
+    }
+  } catch (res) {
+    isOpen.value = true;
+    progressMessage.value = res.response.data.message;
+  } finally {
+    await showAlert();
+  }
+}
 </script>

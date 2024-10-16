@@ -29,7 +29,7 @@
           :items="roles"
           :rules="rolesRules"
           v-model="selectedRoleId"
-          item-text="name"
+          item-title="name"
           item-value="id"
           class="mb-3"
           multiple
@@ -92,31 +92,17 @@ const rolesRules = [
 ];
 // ######################### End Roles Rule ############################
 
-// ###################################### End Add New User Message ################################
-
-// ###################################### Start Get Users Roles Request ################################
-
-async function fetchGetRoles() {
-  try {
-    const response = await useNuxtApp().$axios.get("roles");
-
-    roles.value = response.data.roles;
-  } catch (error) {
-  } finally {
-  }
-}
-
-// ###################################### End Get Users Roles Request ################################
-
 // ###################################### Start Watch Selected Roles ################################
 watch(selectedRoleId, (newRoleId) => {
   const selectedRoles = roles.value.filter((role) =>
     newRoleId.includes(role.id)
   );
   userData.value.Roles = selectedRoles.map((role) => role.id);
-  // console.log("Selected Role IDs:", userData.value.Roles);
+  console.log("Selected Role IDs:", userData.value.Roles);
 });
+// ###################################### End Watch Selected Roles ################################
 
+// ###################################### Start Show Alert Func ################################
 const showAlert = () => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -125,10 +111,24 @@ const showAlert = () => {
     }, 2000);
   });
 };
-// ###################################### End Watch Selected Roles ################################
+// ###################################### End Show Alert Func ################################
+
+// ###################################### Start Get Users Roles Request ################################
+
+async function getRolesReq() {
+  try {
+    const res = await useNuxtApp().$axios.get("roles");
+
+    roles.value = res.data.roles;
+    // console.log("Roles =====>", roles.value);
+  } catch (error) {
+  } finally {
+  }
+}
+
+// ###################################### End Get Users Roles Request ################################
 
 // ###################################### Start Add New User Request ##################################
-
 async function fetchAddUser() {
   try {
     const dataToSend = {
@@ -159,6 +159,6 @@ async function fetchAddUser() {
 // ###################################### End Add New User Request ##################################=
 
 onMounted(() => {
-  fetchGetRoles();
+  getRolesReq();
 });
 </script>

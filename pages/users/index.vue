@@ -106,7 +106,7 @@ useHead({
 // ###################################### Start Consts #################################
 const router = useRouter();
 const usersData = ref([]);
-let userIdToDelete = ref(null);
+const userIdToDelete = ref(null);
 const modeldIsOpend = ref(false);
 const deletedMessage = ref("");
 const modelOpend = ref(false);

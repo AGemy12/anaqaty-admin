@@ -29,7 +29,7 @@
           :items="roles"
           :rules="rolesRules"
           v-model="selectedRoleId"
-          item-text="name"
+          item-title="name"
           item-value="id"
           class="mb-3"
           multiple
