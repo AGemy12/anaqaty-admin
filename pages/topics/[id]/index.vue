@@ -113,9 +113,9 @@ const topicData = ref({
   content: "",
   summary: "",
   category_id: "",
-  keywords: [],
+  keywords: "",
   image: null,
-  tags: [],
+  tags: "",
   IsActive: false,
 });
 // ######################### End Consts ############################
@@ -203,10 +203,15 @@ async function getTopics() {
 
     if (res.status >= 200) {
       topicData.value = res.data.articles[index];
-      selectedCategoryId.value = res.data.articles[index].category;
-      selectedKeywordId.value = res.data.articles[index].keywords;
-      selectedTagId.value = res.data.articles[index].tags;
-      console.log(topicData.value);
+      selectedCategoryId.value = res.data.articles[index].category.id;
+      selectedKeywordId.value = res.data.articles[index].keywords.map(
+        (item) => item.id
+      );
+      selectedTagId.value = res.data.articles[index].tags.map(
+        (item) => item.id
+      );
+
+      console.log(selectedCategoryId, selectedKeywordId, selectedTagId);
     }
   } catch (error) {
     console.error("خطأ في جلب الفئة:", error);
@@ -231,7 +236,9 @@ async function handleUpdateAndPublishTopic() {
     formData.append("slug", topicData.value.slug);
     formData.append("content", topicData.value.content);
     formData.append("summary", topicData.value.summary);
-    formData.append("category_id", selectedCategoryId.value.id);
+    formData.append("category_id", selectedCategoryId.value);
+    console.log("هذا البتاع  ===>", selectedCategoryId.value);
+
     const isActiveValue = topicData.value.IsActive ? 1 : 0;
     formData.append("IsActive", isActiveValue);
 
@@ -241,6 +248,7 @@ async function handleUpdateAndPublishTopic() {
 
     selectedTagId.value.forEach((tagId) => {
       formData.append("tags[]", tagId);
+      console.log(selectedTagId);
     });
 
     if (topicData.value.image) {
@@ -256,7 +264,6 @@ async function handleUpdateAndPublishTopic() {
         },
       }
     );
-    console.log(formData);
     if (res.status === 200) {
       progressMessage.value = res.data.message;
       isOpen.value = true;
@@ -282,7 +289,9 @@ async function handleUpdateAndDraftedTopic() {
     formData.append("slug", topicData.value.slug);
     formData.append("content", topicData.value.content);
     formData.append("summary", topicData.value.summary);
-    formData.append("category_id", selectedCategoryId.value.id);
+    formData.append("category_id", selectedCategoryId.value);
+    console.log(selectedCategoryId.value);
+
     const isActiveValue = topicData.value.IsActive ? 1 : 0;
     formData.append("IsActive", isActiveValue);
 

@@ -31,67 +31,70 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          class="cursor-default text-center duration-300 hover:bg-alt"
-          v-for="(item, index) in topicsData"
-          :key="item.id"
-        >
-          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.id }}
-          </td>
-          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.title }}
-          </td>
-          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.category?.name }}
-          </td>
-          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.views_count }}
-          </td>
-          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            <span
-              class="bg-[green] text-[11px] md:text-[14px] p-[0.2rem] rounded-sm text-white"
-              v-if="item.status === 'published'"
-              >تم النشر</span
-            >
-            <span
-              class="bg-[gray] text-[11px] md:text-[14px] p-[0.2rem] rounded-sm text-white"
-              v-else
-            >
-              مسودة
-            </span>
-          </td>
-          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.updated_at }}
-          </td>
-          <td
-            class="text-[12px] md:text-[15px] whitespace-nowrap flex items-center justify-center"
+        <template v-if="!loading">
+          <tr
+            class="cursor-pointer text-center duration-300 hover:bg-alt"
+            v-for="(item, index) in topicsData"
+            :key="item.id"
+            @click="goToEditPage(item.id, index)"
           >
-            <button
-              class="mx-2 flex items-center justify-center"
-              @click="goToEditPage(item.id, index)"
+            <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+              {{ item.id }}
+            </td>
+            <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+              {{ item.title }}
+            </td>
+            <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+              {{ item.category?.name }}
+            </td>
+            <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+              {{ item.views_count }}
+            </td>
+            <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+              <span
+                class="bg-[green] text-[11px] md:text-[14px] p-[0.2rem] rounded-sm text-white"
+                v-if="item.status === 'published'"
+                >تم النشر</span
+              >
+              <span
+                class="bg-[gray] text-[11px] md:text-[14px] p-[0.2rem] rounded-sm text-white"
+                v-else
+              >
+                مسودة
+              </span>
+            </td>
+            <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+              {{ item.updated_at }}
+            </td>
+            <td
+              class="text-[12px] md:text-[15px] whitespace-nowrap flex items-center justify-center"
             >
-              <Icon
-                name="material-symbols:edit-square-rounded"
-                class="text-[20px] md:text-[25px]"
-              />
-            </button>
-            <button
-              class="flex items-center justify-center"
-              @click="handleDeletTopic(item.id)"
-            >
-              <Icon
-                name="ic:baseline-delete-outline"
-                class="text-[20px] md:text-[25px]"
-              />
-            </button>
-          </td>
-        </tr>
+              <button
+                class="mx-2 flex items-center justify-center"
+                @click="goToEditPage(item.id, index)"
+              >
+                <Icon
+                  name="material-symbols:edit-square-rounded"
+                  class="text-[20px] md:text-[25px]"
+                />
+              </button>
+              <button
+                class="flex items-center justify-center"
+                @click="handleDeletTopic(item.id, $event)"
+              >
+                <Icon
+                  name="ic:baseline-delete-outline"
+                  class="text-[20px] md:text-[25px]"
+                />
+              </button>
+            </td>
+          </tr>
+        </template>
       </tbody>
     </v-table>
     <AlertModel :is-opend="isOpen" :title="deletedMessage" />
     <AnaqatyModel
-      message-title="هل أنت متأكد من أنك تريد حذف هذا الموضوع ؟"
+      message-title="هل أنت متأكد من أنك تريد حذف الموضوع ؟"
       :model-opend="modeldIsOpend"
       :fire-clcik-yes="deleteTopic"
       :fire-clcik-no="cancleDeletePremissionHandel"
@@ -117,6 +120,7 @@ useHead({
 
 // ##################### Start Consts ###################################
 const router = useRouter();
+const loading = ref(true);
 const isOpen = ref(false);
 const showDeleteSuccAlert = ref(false);
 const modeldIsOpend = ref(false);
@@ -157,6 +161,7 @@ async function getTopics() {
     const res = await useNuxtApp().$axios.get("articles");
     if (res.status >= 200) {
       topicsData.value = res.data.articles;
+      loading.value = false;
     }
   } catch (res) {
     isOpen.value = true;
@@ -167,7 +172,8 @@ async function getTopics() {
 // ##################### End Get Topics Request ######################
 
 // ###################################### Start  Delete User Request ###################################
-const handleDeletTopic = (id) => {
+const handleDeletTopic = (id, event) => {
+  event.stopPropagation();
   topicIdToDelete.value = id;
   modeldIsOpend.value = true;
 };

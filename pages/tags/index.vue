@@ -26,58 +26,63 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          class="cursor-default text-center duration-300 hover:bg-alt"
-          v-for="(item, index) in tagsData"
-          :key="item.id"
-        >
-          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.id }}
-          </td>
-          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.name }}
-          </td>
-          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.usage_count }}
-          </td>
-          <td class="text-center text-[12px] md:text-[18px] whitespace-nowrap">
-            <span
-              class="bg-[green] text-[11px] md:text-[14px] p-[0.2rem] rounded-sm text-white"
-              v-if="item.IsActive == 1"
-              >مفعل</span
-            >
-            <span
-              class="bg-[red] text-[11px] md:text-[14px] p-[0.2rem] rounded-sm text-white"
-              v-else
-              >غير مفعل</span
-            >
-          </td>
-          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.updated_at }}
-          </td>
-          <td
-            class="text-[12px] md:text-[15px] whitespace-nowrap flex items-center justify-center"
+        <template v-if="!loading">
+          <tr
+            class="cursor-pointer text-center duration-300 hover:bg-alt"
+            v-for="(item, index) in tagsData"
+            :key="item.id"
+            @click="goToEditPage(item.id, index)"
           >
-            <button
-              class="mx-2 flex items-center justify-center"
-              @click="goToEditPage(item.id, index)"
+            <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+              {{ item.id }}
+            </td>
+            <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+              {{ item.name }}
+            </td>
+            <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+              {{ item.usage_count }}
+            </td>
+            <td
+              class="text-center text-[12px] md:text-[18px] whitespace-nowrap"
             >
-              <Icon
-                name="material-symbols:edit-square-rounded"
-                class="text-[20px] md:text-[25px]"
-              />
-            </button>
-            <button
-              class="flex items-center justify-center"
-              @click="confirmDeleteTag(item.id)"
+              <span
+                class="bg-[green] text-[11px] md:text-[14px] p-[0.2rem] rounded-sm text-white"
+                v-if="item.IsActive == 1"
+                >مفعل</span
+              >
+              <span
+                class="bg-[red] text-[11px] md:text-[14px] p-[0.2rem] rounded-sm text-white"
+                v-else
+                >غير مفعل</span
+              >
+            </td>
+            <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+              {{ item.updated_at }}
+            </td>
+            <td
+              class="text-[12px] md:text-[15px] whitespace-nowrap flex items-center justify-center"
             >
-              <Icon
-                name="ic:baseline-delete-outline"
-                class="text-[20px] md:text-[25px]"
-              />
-            </button>
-          </td>
-        </tr>
+              <button
+                class="mx-2 flex items-center justify-center"
+                @click="goToEditPage(item.id, index)"
+              >
+                <Icon
+                  name="material-symbols:edit-square-rounded"
+                  class="text-[20px] md:text-[25px]"
+                />
+              </button>
+              <button
+                class="flex items-center justify-center"
+                @click="confirmDeleteTag(item.id, $event)"
+              >
+                <Icon
+                  name="ic:baseline-delete-outline"
+                  class="text-[20px] md:text-[25px]"
+                />
+              </button>
+            </td>
+          </tr>
+        </template>
       </tbody>
     </v-table>
     <AnaqatyModel
@@ -111,6 +116,7 @@ useHead({
 
 // ###################### Start Consts ########################
 const router = useRouter();
+const loading = ref(true);
 const tagsData = ref([]);
 const modeldIsOpend = ref(false);
 let tagToDelete = ref(null);
@@ -131,11 +137,12 @@ const showAlert = () => {
 // ########################### End ShoW Alert Func  ##################################
 
 // ###################### Start Get Keyword Request ########################
-async function fetchGetTags() {
+async function getTagsList() {
   try {
     const res = await useNuxtApp().$axios.get("tags");
     if (res.status >= 200) {
       tagsData.value = res.data.Tags;
+      loading.value = false;
     }
   } catch (res) {
     isOpen.value = true;
@@ -154,7 +161,8 @@ const goToEditPage = (id, index) => {
 };
 
 // ###################### Start Delete Keyword Funs ########################
-const confirmDeleteTag = (id) => {
+const confirmDeleteTag = (id, event) => {
+  event.stopPropagation();
   tagToDelete.value = id;
   modeldIsOpend.value = true;
 };
@@ -169,7 +177,7 @@ const deleteTag = async () => {
       const res = await useNuxtApp().$axios.delete(
         `Deletetag/${tagToDelete.value}`
       );
-      await fetchGetTags();
+      await getTagsList();
       modeldIsOpend.value = false;
       isOpen.value = true;
       progressMessage.value = res.data.message;
@@ -182,6 +190,6 @@ const deleteTag = async () => {
 // ###################### End Delete Keyword Funs ########################
 
 onMounted(() => {
-  fetchGetTags();
+  getTagsList();
 });
 </script>

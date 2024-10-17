@@ -26,58 +26,63 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          class="cursor-default text-center duration-300 hover:bg-alt"
-          v-for="(item, index) in categoriesData"
-          :key="item.id"
-        >
-          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.id }}
-          </td>
-          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.name }}
-          </td>
-          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.useCounts }}
-          </td>
-          <td class="text-center text-[12px] md:text-[18px] whitespace-nowrap">
-            <span
-              class="bg-[green] text-[11px] md:text-[14px] p-[0.2rem] rounded-sm text-white"
-              v-if="item.IsActive == 1"
-              >مفعل</span
-            >
-            <span
-              class="bg-[red] text-[11px] md:text-[14px] p-[0.2rem] rounded-sm text-white"
-              v-else
-              >غير مفعل</span
-            >
-          </td>
-          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.updated_at }}
-          </td>
-          <td
-            class="text-[12px] md:text-[15px] whitespace-nowrap flex items-center justify-center"
+        <template v-if="!loading">
+          <tr
+            class="cursor-pointer text-center duration-300 hover:bg-alt"
+            v-for="(item, index) in categoriesData"
+            :key="item.id"
+            @click="goToEditPage(item.id, index)"
           >
-            <button
-              class="mx-2 flex items-center justify-center"
-              @click="goToEditPage(item.id, index)"
+            <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+              {{ item.id }}
+            </td>
+            <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+              {{ item.name }}
+            </td>
+            <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+              {{ item.useCounts }}
+            </td>
+            <td
+              class="text-center text-[12px] md:text-[18px] whitespace-nowrap"
             >
-              <Icon
-                name="material-symbols:edit-square-rounded"
-                class="text-[20px] md:text-[25px]"
-              />
-            </button>
-            <button
-              class="flex items-center justify-center"
-              @click="confirmDeleteCategory(item.id)"
+              <span
+                class="bg-[green] text-[11px] md:text-[14px] p-[0.2rem] rounded-sm text-white"
+                v-if="item.IsActive == 1"
+                >مفعل</span
+              >
+              <span
+                class="bg-[red] text-[11px] md:text-[14px] p-[0.2rem] rounded-sm text-white"
+                v-else
+                >غير مفعل</span
+              >
+            </td>
+            <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+              {{ item.updated_at }}
+            </td>
+            <td
+              class="text-[12px] md:text-[15px] whitespace-nowrap flex items-center justify-center"
             >
-              <Icon
-                name="ic:baseline-delete-outline"
-                class="text-[20px] md:text-[25px]"
-              />
-            </button>
-          </td>
-        </tr>
+              <button
+                class="mx-2 flex items-center justify-center"
+                @click="goToEditPage(item.id, index)"
+              >
+                <Icon
+                  name="material-symbols:edit-square-rounded"
+                  class="text-[20px] md:text-[25px]"
+                />
+              </button>
+              <button
+                class="flex items-center justify-center"
+                @click="confirmDeleteCategory(item.id, $event)"
+              >
+                <Icon
+                  name="ic:baseline-delete-outline"
+                  class="text-[20px] md:text-[25px]"
+                />
+              </button>
+            </td>
+          </tr>
+        </template>
       </tbody>
     </v-table>
     <AnaqatyModel
@@ -111,6 +116,7 @@ useHead({
 
 // ###################### Start Consts #######################
 const router = useRouter();
+const loading = ref(false);
 const categoriesData = ref([]);
 const modeldIsOpend = ref(false);
 let categoryIdToDelete = ref(null);
@@ -131,11 +137,12 @@ const showAlert = () => {
 // ########################### End ShoW Alert Func  ##################################
 
 // ###################### Start Get Categories Request #######################
-async function fetchGetCategories() {
+async function getCategoriesList() {
   try {
     const res = await useNuxtApp().$axios.get("categories");
     if (res.status >= 200) {
       categoriesData.value = res.data.categories;
+      loading.value = false;
     }
   } catch (error) {
     isOpen.value = true;
@@ -154,7 +161,8 @@ const goToEditPage = (id, index) => {
 };
 
 // ###################### Start Detete Category Funcs #################################
-const confirmDeleteCategory = (id) => {
+const confirmDeleteCategory = (id, event) => {
+  event.stopPropagation();
   categoryIdToDelete.value = id;
   modeldIsOpend.value = true;
 };
@@ -169,7 +177,7 @@ const deleteCategory = async () => {
       await useNuxtApp().$axios.delete(
         `DeleteCategory/${categoryIdToDelete.value}`
       );
-      await fetchGetCategories();
+      await getCategoriesList();
       modeldIsOpend.value = false;
       await showAlert();
     } catch (error) {
@@ -180,6 +188,6 @@ const deleteCategory = async () => {
 // ###################### End Detete Category Funcs #################################
 
 onMounted(() => {
-  fetchGetCategories();
+  getCategoriesList();
 });
 </script>

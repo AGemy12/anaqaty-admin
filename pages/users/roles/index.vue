@@ -22,43 +22,46 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          class="cursor-default text-center duration-300 hover:bg-alt"
-          v-for="(item, index) in rolesData"
-          :key="item.id"
-        >
-          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.id }}
-          </td>
-          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.title }}
-          </td>
-          <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-            {{ item.updated_at }}
-          </td>
-          <td
-            class="text-[12px] md:text-[15px] whitespace-nowrap flex items-center justify-center"
+        <template v-if="!loading">
+          <tr
+            class="cursor-pointer text-center duration-300 hover:bg-alt"
+            v-for="(item, index) in rolesData"
+            :key="item.id"
+            @click="goToEditRole(item.id, index)"
           >
-            <button
-              class="mx-2 flex items-center justify-center"
-              @click="goToEditRole(item.id, index)"
+            <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+              {{ item.id }}
+            </td>
+            <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+              {{ item.title }}
+            </td>
+            <td class="text-[12px] md:text-[15px] whitespace-nowrap">
+              {{ item.updated_at }}
+            </td>
+            <td
+              class="text-[12px] md:text-[15px] whitespace-nowrap flex items-center justify-center"
             >
-              <Icon
-                name="material-symbols:edit-square-rounded"
-                class="text-[20px] md:text-[25px]"
-              />
-            </button>
-            <button
-              class="flex items-center justify-center"
-              @click="confirmDeleteRole(item.id)"
-            >
-              <Icon
-                name="ic:baseline-delete-outline"
-                class="text-[20px] md:text-[25px]"
-              />
-            </button>
-          </td>
-        </tr>
+              <button
+                class="mx-2 flex items-center justify-center"
+                @click="goToEditRole(item.id, index)"
+              >
+                <Icon
+                  name="material-symbols:edit-square-rounded"
+                  class="text-[20px] md:text-[25px]"
+                />
+              </button>
+              <button
+                class="flex items-center justify-center"
+                @click="confirmDeleteRole(item.id, $event)"
+              >
+                <Icon
+                  name="ic:baseline-delete-outline"
+                  class="text-[20px] md:text-[25px]"
+                />
+              </button>
+            </td>
+          </tr>
+        </template>
       </tbody>
     </v-table>
     <AnaqatyModel
@@ -93,6 +96,7 @@ definePageMeta({
 
 // ##################### Start Consts ###############################
 const router = useRouter();
+const loading = ref(true);
 const rolesData = ref([]);
 const roleIdToDelete = ref(null);
 const modeldIsOpend = ref(false);
@@ -112,10 +116,13 @@ const showAlert = () => {
 // ##################### End Alert Model ###############################
 
 // ##################### Start Get Roles Request ###############################
-async function fetchGetRoles() {
+async function getRolesList() {
   try {
-    const response = await useNuxtApp().$axios.get("roles");
-    rolesData.value = response.data.roles;
+    const res = await useNuxtApp().$axios.get("roles");
+    if (res.status >= 200) {
+      rolesData.value = res.data.roles;
+      loading.value = false;
+    }
   } catch (error) {
     console.error(error);
   }
@@ -125,7 +132,9 @@ const goToEditRole = (id, index) => {
   router.push(`/users/roles/${id}?index=${index}`);
 };
 
-const confirmDeleteRole = (id) => {
+const confirmDeleteRole = (id, event) => {
+  event.stopPropagation();
+
   roleIdToDelete.value = id;
   modeldIsOpend.value = true;
 };
@@ -140,12 +149,12 @@ const deleteRole = async () => {
       const res = await useNuxtApp().$axios.delete(
         `DeleteRole/${roleIdToDelete.value}`
       );
-      await fetchGetRoles();
+      await getRolesList();
       modeldIsOpend.value = false;
       progressMessage.value = res.data.message;
       isOpend.value = true;
     } catch (res) {
-      progressMessage.value = res.response.data.message;
+      progressMessage.value = res.res.data.message;
       isOpend.value = true;
     } finally {
       await showAlert();
@@ -159,6 +168,6 @@ const goToAddRolePage = () => {
 };
 
 onMounted(() => {
-  fetchGetRoles();
+  getRolesList();
 });
 </script>
