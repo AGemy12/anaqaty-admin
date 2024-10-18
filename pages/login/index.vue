@@ -30,7 +30,7 @@
           <div class="flex justify-between items-center my-3">
             <v-checkbox class="!flex" label="تذكرني"></v-checkbox>
             <a
-              href="/reset-password"
+              href="/forget-password"
               class="text-light_black text-[0.9rem] duration-300 hover:text-black"
               >هل نسيت كلمة المرور ؟</a
             >

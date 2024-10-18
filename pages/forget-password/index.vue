@@ -7,25 +7,15 @@
       class="w-[320px] sm:w-[400px] mx-2 sm:mx-0 bg-alt shadow-shadow p-3 sm:p-8 rounded-md flex flex-col gap-6"
     >
       <h1 class="text-[1.2rem] font-bold w-fit mx-auto border-b-2">
-        إعادة تعيين كلمة المرور
+        نسيت كلمة المرور ؟
       </h1>
       <v-sheet class="mx-auto bg-transparent w-full">
-        <v-form @submit.prevent="handleResetPass">
+        <v-form @submit.prevent="handleSendResMail">
           <v-text-field
             v-model="email"
             :rules="emailRules"
             label="البريد الإلكتروني"
-            class="mb-3"
-          ></v-text-field>
-
-          <v-text-field
-            v-model="password"
-            :rules="passwordRules"
-            :append-inner-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="show1 ? 'text' : 'password'"
-            label="كلمة المرور الجديدة"
-            @click:append-inner="show1 = !show1"
-            class="mb-3"
+            class="mb-4"
           ></v-text-field>
 
           <v-btn
@@ -33,34 +23,30 @@
             type="submit"
             block
           >
-            إعادة تعيين كلمة المرور</v-btn
+            إرسال رابط إعادة تعيين كلمة المرور</v-btn
           >
         </v-form>
       </v-sheet>
+      <AlertModel :is-opend="isOpen" :title="progressMessage" />
     </div>
-    <AlertModel :is-opend="isOpen" :title="progressMessage" />
   </section>
 </template>
 
 <script setup>
+import Logo from "~/components/mini/Logo.vue";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import AlertModel from "~/components/mini/AlertModel.vue";
 definePageMeta({
   layout: "reg",
 });
 useHead({
-  title: "Anaqaty | إعادة تعيين كلمة المرور",
+  title: "Anaqaty | نسيت كلمة المرور",
 });
-import Logo from "~/components/mini/Logo.vue";
-import { useRouter } from "vue-router";
-import { ref } from "vue";
-import AlertModel from "~/components/mini/AlertModel.vue";
-
 const router = useRouter();
 const isOpen = ref(false);
 const progressMessage = ref("");
 const email = ref("");
-const password = ref("");
-
-const show1 = ref(false);
 
 const emailRules = [
   (value) => {
@@ -71,17 +57,6 @@ const emailRules = [
     const emailPattern = /^[a-zA-Z0-9]{2,}@[a-zA-Z]{2,}\.com$/;
     if (emailPattern.test(value)) return true;
     return "يجب إدخال بريد إلكتروني صالح";
-  },
-];
-
-const passwordRules = [
-  (value) => {
-    if (value) return true;
-    return "يجب إدخال كلمة المرور";
-  },
-  (value) => {
-    if (value.length >= 6) return true;
-    return "يجب ألا تقل كلمة المرور عن 6 أحرف";
   },
 ];
 
@@ -96,11 +71,12 @@ const showAlert = () => {
 };
 // ###################################### End Show Alert Func ################################
 
-async function handleResetPass() {
+// ###################################### Start Login Request ===========================================
+
+async function handleSendResMail() {
   try {
-    const res = await useNuxtApp().$axios.post("Updatepassword", {
+    const res = await useNuxtApp().$axios.post("sendResetLink", {
       email: email.value,
-      password: password.value,
     });
 
     if (res.status >= 200) {
@@ -109,7 +85,6 @@ async function handleResetPass() {
       await showAlert();
       router.push("/");
       email.value = "";
-      password.value = "";
     } else {
       isOpen.value = true;
       progressMessage.value = res.data.message;
@@ -121,4 +96,6 @@ async function handleResetPass() {
     await showAlert();
   }
 }
+
+// ###################################### Start Login Request =============================================
 </script>

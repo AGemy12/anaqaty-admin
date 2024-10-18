@@ -86,7 +86,7 @@
       </tbody>
     </v-table>
     <AnaqatyModel
-      message-title="هل أنت متأكد من أنك تريد حذف هذه الفئة؟"
+      message-title="هل أنت متأكد من أنك تريد حذف  الفئة؟"
       :model-opend="modeldIsOpend"
       :fire-clcik-yes="deleteCategory"
       :fire-clcik-no="cancleDeletePremissionHandel"
