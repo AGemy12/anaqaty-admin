@@ -34,7 +34,7 @@
             @click="goToEditPage(item.id, index)"
           >
             <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-              {{ item.id }}
+              {{ categoriesData.length - index }}
             </td>
             <td class="text-[12px] md:text-[15px] whitespace-nowrap">
               {{ item.name }}

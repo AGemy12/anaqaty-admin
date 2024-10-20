@@ -83,6 +83,21 @@ const showAlert = () => {
 };
 
 //################################## End Show Alert Model ###################################
+// ########################### Start Rmove Spaces And Set (-) Func  ##################################
+
+const convertKeywordToSlug = (name) => {
+  return name.trim().replace(/\s+/g, "-");
+};
+// ########################### End Rmove Spaces And Set (-) Func  ##################################
+
+// ########################### Start Watch To Set Old Slug Value  ##################################
+watch(
+  () => category.value.name,
+  (newCategory) => {
+    category.value.slug = convertKeywordToSlug(newCategory);
+  }
+);
+// ########################### End Watch To Set Old Slug Value  ##################################
 
 // ######################### Start Get All Categories Request ############################
 async function fetchCategory() {

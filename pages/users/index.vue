@@ -30,11 +30,11 @@
           <tr
             class="cursor-pointer duration-300 hover:bg-alt text-center"
             v-for="(item, index) in usersData"
-            :key="item.name"
+            :key="item.id"
             @click="goToEditPage(item.id, index)"
           >
             <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-              {{ item.id }}
+              {{ usersData.length - index }}
             </td>
             <td class="text-[12px] md:text-[15px] whitespace-nowrap">
               {{ item.name }}

@@ -34,7 +34,7 @@
             @click="goToEditPage(item.id, index)"
           >
             <td class="text-[12px] md:text-[15px] whitespace-nowrap">
-              {{ item.id }}
+              {{ tagsData.length - index }}
             </td>
             <td class="text-[12px] md:text-[15px] whitespace-nowrap">
               {{ item.name }}
@@ -141,7 +141,7 @@ async function getTagsList() {
   try {
     const res = await useNuxtApp().$axios.get("tags");
     if (res.status >= 200) {
-      tagsData.value = res.data.Tags;
+      tagsData.value = res.data.tags;
       loading.value = false;
     }
   } catch (res) {

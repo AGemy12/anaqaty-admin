@@ -2,7 +2,7 @@
   <section>
     <PagesHeader title="إضافة كلمة مفتاحية جديدة" />
     <v-sheet class="mx-auto bg-transparent w-full md:w-1/2">
-      <v-form @submit.prevent="fetchAddKeyword">
+      <v-form @submit.prevent="addKeyword">
         <v-text-field
           v-model="keyword.keyword"
           label="العنوان"
@@ -99,7 +99,7 @@ const showAlert = () => {
 // ########################### End ShoW Alert Func  ##################################
 
 // ######################### Start Add Keyword Request ###############################
-async function fetchAddKeyword() {
+async function addKeyword() {
   try {
     const dataToSend = {
       ...keyword.value,

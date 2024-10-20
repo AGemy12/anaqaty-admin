@@ -94,14 +94,14 @@ const showAlert = () => {
 };
 // ########################### End ShoW Alert Func  ##################################
 
-// ######################### Start Get Keywords Request ###############################
+// ######################### Start Get Tags Request ###############################
 async function fetchGetTags() {
   try {
     const res = await useNuxtApp().$axios.get(`tags`);
     const index = route.query.index;
 
-    if (res.data.Tags && res.data.Tags[index]) {
-      tag.value = res.data.Tags[index];
+    if (res.status >= 200) {
+      tag.value = res.data.tags[index];
       tag.value.IsActive = tag.value.IsActive === 1;
     }
   } catch (res) {
@@ -111,7 +111,7 @@ async function fetchGetTags() {
     await showAlert();
   }
 }
-// ######################### End Add Keyword Request ###############################
+// ######################### End Add Tags Request ###############################
 
 // ######################### Start Update Keyword Request ############################
 async function fetchUpdateTag() {

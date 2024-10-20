@@ -186,7 +186,7 @@ async function getAllData() {
       useNuxtApp().$axios.get("categories"),
     ]);
 
-    tagsData.value = tagsRes.data.Tags;
+    tagsData.value = tagsRes.data.tags;
     // console.log("TagesData =======>", tagsData.value);
 
     keywords.value = keywordsRes.data.keywords;
