@@ -204,12 +204,12 @@ async function getTopics() {
     if (res.status >= 200) {
       topicData.value = res.data.articles[index];
       selectedCategoryId.value = res.data.articles[index].category.id;
-      // selectedKeywordId.value = res.data.articles[index].keywords.map(
-      //   (item) => item.id
-      // );
-      // selectedTagId.value = res.data.articles[index].tags.map(
-      //   (item) => item.id
-      // );
+      selectedKeywordId.value = res.data.articles[index].keywords.map(
+        (item) => item.id
+      );
+      selectedTagId.value = res.data.articles[index].tags.map(
+        (item) => item.id
+      );
 
       console.log(selectedCategoryId, selectedKeywordId, selectedTagId);
     }
