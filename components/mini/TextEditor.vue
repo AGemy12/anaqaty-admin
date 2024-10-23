@@ -3,8 +3,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineEmits, watch, nextTick } from "vue";
+import { ref, onMounted, defineEmits, nextTick, onBeforeUnmount } from "vue";
 import "quill/dist/quill.snow.css";
+import { debounce } from "lodash";
 
 const props = defineProps({
   content: {
@@ -14,13 +15,20 @@ const props = defineProps({
 });
 const emit = defineEmits(["topicBody"]);
 const topicBody = ref(null);
-const isEditorReady = ref(false); // للتحقق من أن المحرر جاهز
+const isEditorReady = ref(false);
+let observer = null;
+
+const emitContent = debounce(() => {
+  if (topicBody.value) {
+    const content = topicBody.value.root.innerHTML;
+    emit("topicBody", content); // إرسال المحتوى للأب
+  }
+}, 300);
 
 onMounted(async () => {
   if (process.client) {
     const Quill = (await import("quill")).default;
 
-    // تعريف الأحجام الممكنة لاستخدامها في Quill
     const SizeStyle = Quill.import("attributors/style/size");
     SizeStyle.whitelist = [
       "12px",
@@ -33,7 +41,7 @@ onMounted(async () => {
     ];
     Quill.register(SizeStyle, true);
 
-    const handleImageUpload = () => {
+    const handleImageUpload = async () => {
       try {
         const input = document.createElement("input");
         input.setAttribute("type", "file");
@@ -60,26 +68,26 @@ onMounted(async () => {
             console.error("Failed to upload image or get image URL");
           }
         };
-      } catch (res) {}
+      } catch (error) {
+        console.error("Image upload failed:", error);
+      }
     };
 
     const toolbarOptions = [
+      [{ header: [1, 2, 3, false] }],
       ["bold", "italic", "underline", "strike"],
+      [{ list: "ordered" }, { list: "bullet" }],
       ["link", "image"],
       [{ direction: "rtl" }],
       [{ align: [] }],
-      [{ list: "ordered" }, { list: "bullet" }],
-      [{ header: [1, 2, 3, 4, 5, 6, false] }],
       [{ size: ["12px", "14px", "16px", "18px", "24px", "32px", "40px"] }],
       [{ color: [] }, { background: [] }],
       [{ font: [] }],
-      ["clean"], // remove formatting button
+      ["clean"],
     ];
 
-    // استخدام nextTick لضمان أن DOM تم تحميله بالكامل قبل إعداد المحرر
     await nextTick();
 
-    // تهيئة المحرر
     topicBody.value = new Quill("#editor", {
       theme: "snow",
       modules: {
@@ -87,31 +95,51 @@ onMounted(async () => {
       },
     });
 
-    // تخصيص أداة الصورة في المحرر
     const toolbar = topicBody.value.getModule("toolbar");
     toolbar.addHandler("image", handleImageUpload);
 
-    isEditorReady.value = true; // تغيير حالة جاهزية المحرر
+    isEditorReady.value = true;
 
-    // الاستماع لتغير النص في المحرر
+    const targetNode = document.getElementById("editor");
+    observer = new MutationObserver(() => {
+      emitContent(); // إرسال المحتوى بعد التعديلات
+    });
+    observer.observe(targetNode, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+
+    // متابعة تغييرات النص
     topicBody.value.on("text-change", () => {
-      const content = topicBody.value.root.innerHTML;
-      emit("topicBody", content);
+      emitContent(); // إرسال المحتوى المحدث
     });
   }
 });
 
-// مراقبة التغير في props.content وضمان أن المحرر جاهز قبل تعيين المحتوى
 watch(
   () => props.content,
-  async (newContent) => {
-    if (isEditorReady.value && topicBody.value) {
-      // تأخير تعيين المحتوى حتى يصبح المحرر جاهزًا
+  async (newContent, oldContent) => {
+    if (newContent !== oldContent && isEditorReady.value && topicBody.value) {
       await nextTick();
-      topicBody.value.clipboard.dangerouslyPasteHTML(newContent);
+
+      // تحديث المحتوى فقط إذا كان مختلفًا عن الحالي
+      if (topicBody.value.root.innerHTML !== newContent) {
+        topicBody.value.clipboard.dangerouslyPasteHTML(newContent); // تحديث المحتوى
+      }
     }
   }
 );
+
+onBeforeUnmount(() => {
+  if (topicBody.value) {
+    topicBody.value.off("text-change");
+    topicBody.value.off("selection-change");
+  }
+  if (observer) {
+    observer.disconnect();
+  }
+});
 </script>
 
 <style>
@@ -137,7 +165,6 @@ watch(
   display: none;
 }
 
-/* جعل القوائم تظهر كأرقام بدلاً من Normal */
 .ql-picker-item[data-value="12px"]::before {
   content: "12px" !important;
 }

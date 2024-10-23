@@ -60,10 +60,13 @@
         >
           <Button
             :fire-click="handleUpdateAndPublishTopic"
-            title="تعديل ونشر"
+            :title="
+              topicData.status === articlePublished ? 'تحديث' : 'تعديل ونشر'
+            "
             addStyle="text-[15px] md:text-[16px] bg-black"
           />
           <Button
+            v-if="topicData.status !== 'published'"
             :fire-click="handleUpdateAndDraftedTopic"
             title=" تعديل وحفظ"
             addStyle="text-[15px] md:text-[16px] "
@@ -106,6 +109,7 @@ const selectedTagId = ref([]);
 const selectedCategoryId = ref("");
 const selectedKeywordId = ref([]);
 const progressMessage = ref("");
+const articlePublished = ref("published");
 const isOpen = ref(false);
 const topicData = ref({
   title: "",
@@ -140,7 +144,7 @@ const convertTitleToSlug = (title) => {
 // ########################### End Rmove Spaces And Set (-) Func  ##################################
 
 // ###################################### Start Watch Selected Roles ################################
-watch(
+watchEffect(
   [
     selectedTagId,
     selectedKeywordId,
@@ -201,15 +205,15 @@ async function getTopics() {
     const res = await useNuxtApp().$axios.get(`articles`);
     const index = route.query.index;
 
-    if (res.status >= 200) {
+    if (res.status >= 200 && res.status < 300) {
       topicData.value = res.data.articles[index];
+      topicData.value.IsActive = !!res.data.articles[index].IsActive;
+
       selectedCategoryId.value = res.data.articles[index].category.id;
-      selectedKeywordId.value = res.data.articles[index].keywords.map(
-        (item) => item.id
-      );
-      selectedTagId.value = res.data.articles[index].tags.map(
-        (item) => item.id
-      );
+      selectedTagId.value =
+        res.data.articles[index].tags?.map((item) => item.id) || [];
+      selectedKeywordId.value =
+        res.data.articles[index].keywords?.map((item) => item.id) || [];
 
       console.log(selectedCategoryId, selectedKeywordId, selectedTagId);
     }
@@ -337,8 +341,14 @@ async function handleUpdateAndDraftedTopic() {
 // ###################################### End Add New User Request ##################################=
 
 onMounted(async () => {
-  await getAllData();
-  await getTopics();
+  try {
+    await getAllData();
+    await getTopics();
+  } catch (error) {
+    progressMessage.value = "فشل في تحميل البيانات";
+    isOpen.value = true;
+    await showAlert();
+  }
 });
 
 // ###################################### End Update User Request ===============================
